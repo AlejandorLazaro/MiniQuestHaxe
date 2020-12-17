@@ -1,0 +1,11 @@
+#####=== OSX ===#####
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# VSCode
+.vscode/
+
+# HaxeFlixel
+hxformat.json
+export/
