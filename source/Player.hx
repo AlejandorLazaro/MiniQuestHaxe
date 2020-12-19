@@ -1,5 +1,6 @@
 package;
 
+import Item.ItemType;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
@@ -19,8 +20,8 @@ class Player extends FlxSprite
 {
 	var player:Player;
 	var weapon:WeaponType;
+	var unlockedItems:Map<ItemType, Bool>; // We need something to represent unlocking items via pickups
 
-	// var unlockedWeapons = new Array<WeaponType>(); // We need something to represent unlocking weapons via pickups
 	// var stepSound:FlxSound;
 	static inline var SPEED:Float = 200;
 
@@ -28,6 +29,7 @@ class Player extends FlxSprite
 	{
 		super(x, y);
 		this.weapon = WeaponType.NONE;
+		this.unlockedItems = [];
 		loadGraphic(AssetPaths.Sprites__png, true, 10, 10);
 		// setFacingFlip(FlxObject.LEFT, false, false);
 		// setFacingFlip(FlxObject.RIGHT, true, false);
@@ -145,5 +147,10 @@ class Player extends FlxSprite
 					this.weapon = BOW;
 			}
 		}
+	}
+
+	public function unlockItem(item:Item.ItemType)
+	{
+		this.unlockedItems[item] = true;
 	}
 }

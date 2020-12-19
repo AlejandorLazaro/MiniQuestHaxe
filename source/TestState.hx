@@ -4,6 +4,7 @@ import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxState;
 import flixel.addons.editors.ogmo.FlxOgmo3Loader;
+import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.tile.FlxTilemap;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
@@ -12,6 +13,8 @@ class TestState extends FlxState
 {
 	var player:Player;
 	var map:FlxOgmo3Loader;
+	// var hud:HUD;
+	var items:FlxTypedGroup<Item>;
 	var overworld:FlxTilemap;
 	var endButton:FlxButton;
 
@@ -48,6 +51,9 @@ class TestState extends FlxState
 		// coinSound = FlxG.sound.load(AssetPaths.coin__wav);
 		// add(coins);
 
+		items = new FlxTypedGroup<Item>();
+		add(items);
+
 		// enemies = new FlxTypedGroup<Enemy>();
 		// add(enemies);
 
@@ -82,6 +88,7 @@ class TestState extends FlxState
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
+		FlxG.overlap(player, items, playerTouchItem);
 		FlxG.collide(player, overworld);
 		// FlxG.overlap(player, coins, playerTouchCoin);
 		// FlxG.collide(enemies, walls);
@@ -98,9 +105,15 @@ class TestState extends FlxState
 		{
 			player.setPosition(x, y);
 		}
-		else if (entity.name == "coin")
+		else if (entity.name == "sword")
 		{
 			// coins.add(new Coin(x + 4, y + 4));
+			items.add(new Item(x, y, SWORD));
+		}
+		else if (entity.name == "bow")
+		{
+			// 	// coins.add(new Coin(x + 4, y + 4));
+			items.add(new Item(x, y, BOW));
 		}
 		else if (entity.name == "enemy")
 		{
@@ -109,6 +122,16 @@ class TestState extends FlxState
 		else if (entity.name == "boss")
 		{
 			// enemies.add(new Enemy(x + 4, y, BOSS));
+		}
+	}
+
+	function playerTouchItem(player:Player, item:Item)
+	{
+		if (player.alive && player.exists && item.alive && item.exists)
+		{
+			player.unlockItem(item.type);
+			// hud.unlockItem(item.type);
+			item.kill();
 		}
 	}
 
