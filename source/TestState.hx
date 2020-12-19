@@ -13,7 +13,7 @@ class TestState extends FlxState
 {
 	var player:Player;
 	var map:FlxOgmo3Loader;
-	// var hud:HUD;
+	var hud:HUD;
 	var items:FlxTypedGroup<Item>;
 	var overworld:FlxTilemap;
 	var endButton:FlxButton;
@@ -63,8 +63,8 @@ class TestState extends FlxState
 
 		FlxG.camera.follow(player, TOPDOWN, 1);
 
-		// hud = new HUD();
-		// add(hud);
+		hud = new HUD();
+		add(hud);
 
 		// combatHud = new CombatHUD();
 		// add(combatHud);
@@ -130,7 +130,7 @@ class TestState extends FlxState
 		if (player.alive && player.exists && item.alive && item.exists)
 		{
 			player.unlockItem(item.type);
-			// hud.unlockItem(item.type);
+			hud.unlockItem(item.type);
 			item.kill();
 		}
 	}
