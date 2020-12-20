@@ -5,9 +5,6 @@ import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.math.FlxPoint;
-import flixel.system.FlxSound;
-import flixel.util.FlxColor;
-import js.html.BodyElement;
 
 enum WeaponType
 {
