@@ -22,7 +22,7 @@ class Main extends Sprite
 		#end
 
 		super();
-		addChild(new FlxGame(280, 200, MenuState));
+		addChild(new FlxGame(210, 150, MenuState));
 
 		if (save.data.volume != null)
 		{

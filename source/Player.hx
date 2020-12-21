@@ -20,20 +20,21 @@ class Player extends FlxSprite
 	var unlockedItems:Map<ItemType, Bool>; // We need something to represent unlocking items via pickups
 
 	// var stepSound:FlxSound;
-	static inline var SPEED:Float = 200;
+	static inline var SPEED:Float = 100;
 
 	public function new(x:Float = 0, y:Float = 0)
 	{
 		super(x, y);
 		this.weapon = WeaponType.NONE;
 		this.unlockedItems = [];
-		loadGraphic(AssetPaths.Sprites__png, true, 10, 10);
-		// setFacingFlip(FlxObject.LEFT, false, false);
-		// setFacingFlip(FlxObject.RIGHT, true, false);
-		animation.add("idle", [0, 2, 0, 1], 6, false);
-		// animation.add("lr", [3, 4, 3, 5], 6, false);
-		// animation.add("u", [6, 7, 6, 8], 6, false);
-		// animation.add("d", [0, 1, 0, 2], 6, false);
+		loadGraphic(AssetPaths.Sprites2__png, true, 10, 10);
+		animation.add("idle", [0, 2, 0, 3, 1], 6, false);
+		animation.add("sword_idle", [5, 6, 7, 8], 6, false);
+		animation.add("bow_idle", [10, 11, 12, 13], 6, false);
+		animation.add("basic_attack", [4, 4, 0], 6, false);
+		animation.add("sword_attack", [9, 5, 9, 5], 6, false);
+		animation.add("bow_attack", [14, 14, 13], 6, false);
+
 		drag.x = drag.y = 1600;
 		setSize(6, 7);
 		offset.set(2, 3);
@@ -52,12 +53,18 @@ class Player extends FlxSprite
 		var down:Bool = false;
 		var left:Bool = false;
 		var right:Bool = false;
+		var use:Bool = false;
+		var equip_1:Bool = false;
+		var equip_2:Bool = false;
 
 		#if FLX_KEYBOARD
 		up = FlxG.keys.anyPressed([UP, W]);
 		down = FlxG.keys.anyPressed([DOWN, S]);
 		left = FlxG.keys.anyPressed([LEFT, A]);
 		right = FlxG.keys.anyPressed([RIGHT, D]);
+		use = FlxG.keys.anyPressed([SPACE]);
+		equip_1 = FlxG.keys.anyPressed([ONE]); // Sword Button
+		equip_2 = FlxG.keys.anyPressed([TWO]); // Bow Button
 		#end
 		#if mobile
 		var virtualPad = PlayState.virtualPad;
@@ -66,6 +73,9 @@ class Player extends FlxSprite
 		left = left || virtualPad.buttonLeft.pressed;
 		right = right || virtualPad.buttonRight.pressed;
 		#end
+
+		if (equip_1 && equip_2)
+			equip_1 = equip_2 = false;
 
 		if (up && down)
 			up = down = false;
@@ -107,25 +117,59 @@ class Player extends FlxSprite
 			// Determine the player's velocity based on angle and speed (deals with hypotenuse travel correctly)
 			velocity.set(SPEED, 0);
 			velocity.rotate(FlxPoint.weak(0, 0), newAngle);
-
-			// // if the player is moving (velocity is not 0 for either axis), we need to change the animation to match their facing
-			// if ((velocity.x != 0 || velocity.y != 0) && touching == FlxObject.NONE)
-			// {
-			// 	switch (facing)
-			// 	{
-			// 		case FlxObject.LEFT, FlxObject.RIGHT:
-			// 			animation.play("lr");
-			// 		case FlxObject.UP:
-			// 			animation.play("u");
-			// 		case FlxObject.DOWN:
-			// 			animation.play("d");
-			// 	}
-			// 	stepSound.play();
-			// }
 		}
-		else
+
+		// 1. Animating an attack is the highest priority
+		if (use)
 		{
-			animation.play("idle");
+			switch (weapon)
+			{
+				case NONE:
+					animation.play("basic_attack");
+				case SWORD:
+					animation.play("sword_attack");
+				case BOW:
+					animation.play("bow_attack");
+			}
+		}
+		// 2. Animating weapon switches is 2nd priority
+		else if (equip_1 && unlockedItems.get(SWORD))
+		{
+			changeWeapon(SWORD);
+			animation.play("sword_idle");
+		}
+		else if (equip_2 && unlockedItems.get(BOW))
+		{
+			changeWeapon(BOW);
+			animation.play("bow_idle");
+		}
+			// 3. Animating movement is 3rd priority
+			// // if the player is moving (velocity is not 0 for either axis), we need to change the animation to match their facing
+			// else if ((velocity.x != 0 || velocity.y != 0) && touching == FlxObject.NONE)
+			// {
+			// 	// switch (facing)
+			// 	// {
+			// 	// 	case FlxObject.LEFT, FlxObject.RIGHT:
+			// 	// 		animation.play("lr");
+			// 	// 	case FlxObject.UP:
+			// 	// 		animation.play("u");
+			// 	// 	case FlxObject.DOWN:
+			// 	// 		animation.play("d");
+			// 	// }
+			// 	// // stepSound.play();
+			// }
+		// 4. Animating the idle player is the last priority
+		else if (animation.finished)
+		{
+			switch (weapon)
+			{
+				case NONE:
+					animation.play("idle");
+				case SWORD:
+					animation.play("sword_idle");
+				case BOW:
+					animation.play("bow_idle");
+			}
 		}
 	}
 
@@ -148,6 +192,13 @@ class Player extends FlxSprite
 
 	public function unlockItem(item:Item.ItemType)
 	{
-		this.unlockedItems[item] = true;
+		unlockedItems[item] = true;
+		switch (item)
+		{
+			case SWORD:
+				changeWeapon(SWORD);
+			case BOW:
+				changeWeapon(BOW);
+		}
 	}
 }
