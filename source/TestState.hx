@@ -12,6 +12,7 @@ import flixel.util.FlxColor;
 class TestState extends FlxState
 {
 	var player:Player;
+	var enemies:FlxTypedGroup<Enemy>;
 	var map:FlxOgmo3Loader;
 	var hud:HUD;
 	var items:FlxTypedGroup<Item>;
@@ -54,8 +55,8 @@ class TestState extends FlxState
 		items = new FlxTypedGroup<Item>();
 		add(items);
 
-		// enemies = new FlxTypedGroup<Enemy>();
-		// add(enemies);
+		enemies = new FlxTypedGroup<Enemy>();
+		add(enemies);
 
 		player = new Player();
 		map.loadEntities(placeEntities, "entities");
@@ -101,27 +102,18 @@ class TestState extends FlxState
 		var x = entity.x;
 		var y = entity.y;
 
-		if (entity.name == "player")
+		switch (entity.name)
 		{
-			player.setPosition(x, y);
-		}
-		else if (entity.name == "sword")
-		{
-			// coins.add(new Coin(x + 4, y + 4));
-			items.add(new Item(x, y, SWORD));
-		}
-		else if (entity.name == "bow")
-		{
-			// 	// coins.add(new Coin(x + 4, y + 4));
-			items.add(new Item(x, y, BOW));
-		}
-		else if (entity.name == "enemy")
-		{
-			// enemies.add(new Enemy(x + 4, y, REGULAR));
-		}
-		else if (entity.name == "boss")
-		{
-			// enemies.add(new Enemy(x + 4, y, BOSS));
+			case "player":
+				player.setPosition(x, y);
+			case "sword":
+				items.add(new Item(x, y, SWORD));
+			case "bow":
+				items.add(new Item(x, y, BOW));
+			case "castle":
+				true; // Deal with the castle
+			default: // Assume everything else is an enemy
+				enemies.add(new Enemy(x, y, entity.name));
 		}
 	}
 
