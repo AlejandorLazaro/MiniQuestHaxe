@@ -9,6 +9,8 @@ import flixel.tile.FlxTilemap;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
 
+using flixel.util.FlxSpriteUtil;
+
 class TestState extends FlxState
 {
 	var player:Player;
@@ -91,10 +93,9 @@ class TestState extends FlxState
 		super.update(elapsed);
 		FlxG.overlap(player, items, playerTouchItem);
 		FlxG.collide(player, overworld);
-		// FlxG.overlap(player, coins, playerTouchCoin);
-		// FlxG.collide(enemies, walls);
+		FlxG.collide(enemies, overworld);
 		// enemies.forEachAlive(checkEnemyVision);
-		// FlxG.overlap(player, enemies, playerTouchEnemy);
+		FlxG.overlap(player, enemies, playerTouchEnemy);
 	}
 
 	function placeEntities(entity:EntityData)
@@ -124,6 +125,16 @@ class TestState extends FlxState
 			player.unlockItem(item.type);
 			hud.unlockItem(item.type);
 			item.kill();
+		}
+	}
+
+	function playerTouchEnemy(player:Player, enemy:Enemy)
+	{
+		if (player.alive && player.exists && enemy.alive && enemy.exists && !enemy.isFlickering())
+		{
+			// Add logic to deal with whether the player or the enemy takes damage
+			// For now, the enemy will always just die. Lol.
+			enemy.kill();
 		}
 	}
 
