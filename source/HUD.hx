@@ -12,10 +12,10 @@ using flixel.util.FlxSpriteUtil;
 class HUD extends FlxTypedGroup<FlxSprite>
 {
 	var background:FlxSprite;
-	var itemStatus:FlxText;
+	var statusText:FlxText;
 	var swordPickup:FlxSprite;
 	var bowPickup:FlxSprite;
-	var test:FlxText;
+	var healthCounter:FlxText;
 
 	public function new()
 	{
@@ -24,8 +24,9 @@ class HUD extends FlxTypedGroup<FlxSprite>
 		background.drawRect(0, 19, FlxG.width, 1, FlxColor.WHITE);
 		add(background);
 
-		itemStatus = new FlxText(0, 2, 0, "Items Not Picked Up", 8);
-		add(itemStatus);
+		healthCounter = new FlxText(16, 2, 0, "3 / 3", 8);
+		healthCounter.setBorderStyle(SHADOW, FlxColor.GRAY, 1, 1);
+		add(healthCounter);
 
 		// Adding row of item pickups (with greyed icons to show they aren't gathered initially)
 		swordPickup = new FlxSprite(FlxG.width - 20 - 5, 2, AssetPaths.sword__png);
@@ -38,15 +39,18 @@ class HUD extends FlxTypedGroup<FlxSprite>
 		forEach(function(sprite) sprite.scrollFactor.set(0, 0));
 	}
 
+	public function updateHealth(health:Int)
+	{
+		healthCounter.text = health + " / 3";
+	}
+
 	public function unlockItem(item:Item.ItemType)
 	{
 		switch (item)
 		{
 			case SWORD:
-				itemStatus.text = "Sword Picked Up";
 				swordPickup.color = FlxColor.WHITE;
 			case BOW:
-				itemStatus.text = "Bow Picked Up";
 				bowPickup.color = FlxColor.WHITE;
 		}
 	}

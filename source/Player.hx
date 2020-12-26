@@ -6,6 +6,8 @@ import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.math.FlxPoint;
 
+using StringTools;
+
 enum WeaponType
 {
 	NONE;
@@ -25,6 +27,7 @@ class Player extends FlxSprite
 	public function new(x:Float = 0, y:Float = 0)
 	{
 		super(x, y);
+		this.health = 3; // Initial health is 3
 		this.weapon = WeaponType.NONE;
 		this.unlockedItems = [];
 		loadGraphic(AssetPaths.Sprites2__png, true, 10, 10);
@@ -200,5 +203,10 @@ class Player extends FlxSprite
 			case BOW:
 				changeWeapon(BOW);
 		}
+	}
+
+	public function activeDamageAura():Bool
+	{
+		return StringTools.endsWith(this.animation.name, "attack");
 	}
 }

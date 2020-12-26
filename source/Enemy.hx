@@ -13,6 +13,9 @@ class Enemy extends FlxSprite
 {
 	static inline var SPEED:Float = 80;
 
+	// These variables will be used to track the enemySprite's health
+	var enemyMaxHealth:Int;
+
 	var idleTimer:Float;
 	var moveDirection:Float;
 	var stepSound:FlxSound;
@@ -48,13 +51,18 @@ class Enemy extends FlxSprite
 		{
 			case "miasma":
 				graphic = AssetPaths.Miasma__png;
+				enemyMaxHealth = 2;
 			case "fire_ant":
 				graphic = AssetPaths.FireAnt__png;
+				enemyMaxHealth = 5;
 			case "crab":
 				graphic = AssetPaths.Crab__png;
+				enemyMaxHealth = 2;
 			case "sand_creep":
 				graphic = AssetPaths.SandCreep__png;
+				enemyMaxHealth = 3;
 		}
+		health = enemyMaxHealth;
 		loadGraphic(graphic, true, 10, 10);
 	}
 }

@@ -94,6 +94,7 @@ class TestState extends FlxState
 		FlxG.overlap(player, items, playerTouchItem);
 		FlxG.collide(player, overworld);
 		FlxG.collide(enemies, overworld);
+		FlxG.collide(enemies, enemies);
 		// enemies.forEachAlive(checkEnemyVision);
 		FlxG.overlap(player, enemies, playerTouchEnemy);
 	}
@@ -130,12 +131,37 @@ class TestState extends FlxState
 
 	function playerTouchEnemy(player:Player, enemy:Enemy)
 	{
-		if (player.alive && player.exists && enemy.alive && enemy.exists && !enemy.isFlickering())
+		if (player.alive && player.exists && enemy.alive && enemy.exists && !player.isFlickering() && !enemy.isFlickering())
 		{
 			// Add logic to deal with whether the player or the enemy takes damage
 			// For now, the enemy will always just die. Lol.
-			enemy.kill();
+			//
+			// Eventually make this return a numeric value to change the damage enemies take,
+			// since it'd be nice to have different damage values (upgrades, etc)
+			if (player.activeDamageAura())
+			{
+				enemy.health--;
+				if (enemy.health == 0)
+				{
+					enemy.kill();
+				}
+				enemy.flicker();
+			}
+			else
+			{
+				if (player.health > 0)
+				{
+					player.health--;
+					hud.updateHealth(Std.int(player.health));
+				}
+				else if (player.health == 0)
+				{
+					player.kill();
+				}
+				player.flicker();
+			}
 		}
+		FlxG.collide(player, enemy);
 	}
 
 	function doneFadeOut()
