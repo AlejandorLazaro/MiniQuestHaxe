@@ -19,6 +19,8 @@ class TestState extends FlxState
 	var hud:HUD;
 	var items:FlxTypedGroup<Item>;
 	var overworld:FlxTilemap;
+	var ending:Bool;
+	// var won:Bool; // This will always be false for our Test state
 	var endButton:FlxButton;
 
 	override public function create()
@@ -91,12 +93,25 @@ class TestState extends FlxState
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
-		FlxG.overlap(player, items, playerTouchItem);
-		FlxG.collide(player, overworld);
-		FlxG.collide(enemies, overworld);
-		FlxG.collide(enemies, enemies);
-		// enemies.forEachAlive(checkEnemyVision);
-		FlxG.overlap(player, enemies, playerTouchEnemy);
+		if (ending)
+		{
+			return;
+		}
+		else
+		{
+			FlxG.overlap(player, items, playerTouchItem);
+			FlxG.collide(player, overworld);
+			FlxG.collide(enemies, overworld);
+			FlxG.collide(enemies, enemies);
+			// enemies.forEachAlive(checkEnemyVision);
+			FlxG.overlap(player, enemies, playerTouchEnemy);
+			if (player.health == 0)
+			{
+				player.kill();
+				ending = true;
+				doneFadeOut();
+			}
+		}
 	}
 
 	function placeEntities(entity:EntityData)
@@ -149,15 +164,8 @@ class TestState extends FlxState
 			}
 			else
 			{
-				if (player.health > 0)
-				{
-					player.health--;
-					hud.updateHealth(Std.int(player.health));
-				}
-				else if (player.health == 0)
-				{
-					player.kill();
-				}
+				player.health--;
+				hud.updateHealth(Std.int(player.health));
 				player.flicker();
 			}
 		}
@@ -168,7 +176,7 @@ class TestState extends FlxState
 	{
 		FlxG.camera.fade(FlxColor.BLACK, 0.33, false, function()
 		{
-			FlxG.switchState(new MenuState());
+			FlxG.switchState(new GameOverState(false));
 		});
 	}
 }
