@@ -104,7 +104,7 @@ class TestState extends FlxState
 			FlxG.collide(player, overworld);
 			FlxG.collide(enemies, overworld);
 			FlxG.collide(enemies, enemies);
-			// enemies.forEachAlive(checkEnemyVision);
+			enemies.forEachAlive(checkEnemyVision);
 			FlxG.overlap(player, enemies, playerTouchEnemy);
 			if (player.health == 0)
 			{
@@ -137,6 +137,8 @@ class TestState extends FlxState
 		}
 	}
 
+	// Functions determining collision effects
+
 	function playerTouchItem(player:Player, item:Item)
 	{
 		if (player.alive && player.exists && item.alive && item.exists)
@@ -161,6 +163,12 @@ class TestState extends FlxState
 				enemy.health--;
 				if (enemy.health == 0)
 				{
+					// This is special behavior that allows Miasma enemies to
+					// swarm if they see the player kill another Miasma entity
+					if (Type.getClass(enemy) == Miasma)
+					{
+						enemies.forEachOfType(Miasma, checkSeenEnemyKilled);
+					}
 					enemy.kill();
 				}
 				enemy.flicker();
@@ -173,6 +181,30 @@ class TestState extends FlxState
 			}
 		}
 		FlxG.collide(player, enemy);
+	}
+
+	// Functions determining enemy characteristics (such as seeing the player)
+
+	function checkEnemyVision(enemy:Enemy)
+	{
+		if (overworld.ray(enemy.getMidpoint(), player.getMidpoint()))
+		{
+			enemy.seesPlayer = true;
+			enemy.playerPosition = player.getMidpoint();
+		}
+		else
+		{
+			enemy.seesPlayer = false;
+		}
+	}
+
+	function checkSeenEnemyKilled(enemy:Enemy)
+	{
+		if (enemy.seesPlayer == true)
+		{
+			enemy.state = SWARMING;
+			enemy.playerPosition = player.getMidpoint();
+		}
 	}
 
 	function doneFadeOut()

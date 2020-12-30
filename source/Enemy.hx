@@ -9,6 +9,12 @@ import flixel.system.FlxSound;
 
 using flixel.util.FlxSpriteUtil;
 
+enum State
+{
+	IDLE;
+	SWARMING;
+}
+
 class Enemy extends FlxSprite
 {
 	static inline var SPEED:Float = 80;
@@ -19,8 +25,8 @@ class Enemy extends FlxSprite
 	var enemyMaxHealth:Int;
 	var idleTimer:Float;
 	var moveDirection:Float;
-	var stepSound:FlxSound;
 
+	public var state:State;
 	public var seesPlayer:Bool;
 	public var playerPosition:FlxPoint;
 

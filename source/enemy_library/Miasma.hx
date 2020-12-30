@@ -2,20 +2,13 @@ package enemy_library;
 
 import flixel.FlxG;
 import flixel.math.FlxPoint;
+import flixel.math.FlxVelocity;
 
 using flixel.util.FlxSpriteUtil;
-
-enum State
-{
-	IDLE;
-	SWARMING;
-}
 
 class Miasma extends Enemy
 {
 	static inline var SPEED:Float = 60;
-
-	var initialState:State;
 
 	override public function new(x:Float, y:Float)
 	{
@@ -29,7 +22,7 @@ class Miasma extends Enemy
 		enemyMaxHealth = 2;
 		health = enemyMaxHealth;
 
-		initialState = IDLE;
+		state = IDLE; // Initially this enemy starts off idle
 		idleTimer = 0;
 		playerPosition = FlxPoint.get();
 	}
@@ -38,6 +31,12 @@ class Miasma extends Enemy
 	{
 		if (this.isFlickering())
 			return;
+		else if (state == SWARMING)
+		{
+			// Chase after the player until line of sight is lost
+			animation.play("idle"); // Update this later when there's a unique animation for it
+			swarmingBehavior(elapsed);
+		}
 		else
 		{
 			animation.play("idle");
@@ -66,5 +65,10 @@ class Miasma extends Enemy
 		}
 		else
 			idleTimer -= elapsed;
+	}
+
+	function swarmingBehavior(elapsed:Float)
+	{
+		FlxVelocity.moveTowardsPoint(this, playerPosition, Std.int(SPEED));
 	}
 }
