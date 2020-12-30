@@ -1,5 +1,6 @@
 package;
 
+import enemy_library.Crab;
 import enemy_library.Miasma;
 import flixel.FlxG;
 import flixel.FlxObject;
@@ -132,6 +133,8 @@ class TestState extends FlxState
 				true; // Deal with the castle
 			case "miasma":
 				enemies.add(new Miasma(x, y));
+			case "crab":
+				enemies.add(new Crab(x, y));
 			default: // Assume everything else is an enemy
 				enemies.add(new Enemy(x, y, entity.name));
 		}
