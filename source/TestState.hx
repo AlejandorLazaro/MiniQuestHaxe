@@ -16,6 +16,7 @@ using flixel.util.FlxSpriteUtil;
 class TestState extends FlxState
 {
 	var player:Player;
+	var castle:Castle;
 	var enemies:FlxTypedGroup<Enemy>;
 	var map:FlxOgmo3Loader;
 	var hud:HUD;
@@ -64,8 +65,10 @@ class TestState extends FlxState
 		enemies = new FlxTypedGroup<Enemy>();
 		add(enemies);
 
+		castle = new Castle();
 		player = new Player();
 		map.loadEntities(placeEntities, "entities");
+		add(castle);
 		add(player);
 
 		FlxG.camera.follow(player, TOPDOWN, 1);
@@ -102,6 +105,7 @@ class TestState extends FlxState
 		else
 		{
 			FlxG.overlap(player, items, playerTouchItem);
+			FlxG.overlap(player, castle, playerTouchCastle);
 			FlxG.collide(player, overworld);
 			FlxG.collide(enemies, overworld);
 			FlxG.collide(enemies, enemies);
@@ -130,7 +134,7 @@ class TestState extends FlxState
 			case "bow":
 				items.add(new Item(x, y, BOW));
 			case "castle":
-				true; // Deal with the castle
+				castle.setPosition(x, y);
 			case "miasma":
 				enemies.add(new Miasma(x, y));
 			case "crab":
@@ -149,6 +153,14 @@ class TestState extends FlxState
 			player.unlockItem(item.type);
 			hud.unlockItem(item.type);
 			item.kill();
+		}
+	}
+
+	function playerTouchCastle(player:Player, castle:Castle)
+	{
+		if (player.alive && player.exists && castle.alive && castle.exists)
+		{
+			player.health = 0; // Placeholder logic that kills the player until we have something meaningful happening with the castle, like loading a new level/area
 		}
 	}
 
