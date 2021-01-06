@@ -57,6 +57,18 @@ class Enemy extends FlxSprite
 		super.update(elapsed);
 	}
 
+	public function onSeeingEnemyEntity(point:FlxPoint)
+	{
+		state = SWARMING;
+		playerPosition = point;
+	}
+
+	public function onSeingAllyKilled(point:FlxPoint)
+	{
+		// No-op for most enemies
+		return;
+	}
+
 	function setPropertiesForName(name:String)
 	{
 		var graphic = AssetPaths.not_available__png;

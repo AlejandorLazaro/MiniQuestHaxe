@@ -205,7 +205,7 @@ class TestState extends FlxState
 		if (overworld.ray(enemy.getMidpoint(), player.getMidpoint()))
 		{
 			enemy.seesPlayer = true;
-			enemy.playerPosition = player.getMidpoint();
+			enemy.onSeeingEnemyEntity(player.getMidpoint());
 		}
 		else
 		{
@@ -217,8 +217,7 @@ class TestState extends FlxState
 	{
 		if (enemy.seesPlayer == true)
 		{
-			enemy.state = SWARMING;
-			enemy.playerPosition = player.getMidpoint();
+			enemy.onSeingAllyKilled(player.getMidpoint());
 		}
 	}
 

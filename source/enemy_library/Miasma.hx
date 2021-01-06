@@ -10,6 +10,9 @@ class Miasma extends Enemy
 {
 	static inline var SPEED:Float = 60;
 
+	var swarmTimer:Float;
+	var everBeenEnraged:Bool;
+
 	override public function new(x:Float, y:Float)
 	{
 		super(x, y, "preconfigured");
@@ -23,7 +26,9 @@ class Miasma extends Enemy
 		health = enemyMaxHealth;
 
 		state = IDLE; // Initially this enemy starts off idle
+		everBeenEnraged = false;
 		idleTimer = 0;
+		swarmTimer = 0;
 		playerPosition = FlxPoint.get();
 	}
 
@@ -43,6 +48,24 @@ class Miasma extends Enemy
 			idleBehavior(elapsed);
 		}
 		super.update(elapsed);
+	}
+
+	override public function onSeeingEnemyEntity(point:FlxPoint)
+	{
+		if (everBeenEnraged)
+		{
+			swarmTimer = FlxG.random.int(2, 4);
+			state = SWARMING;
+			playerPosition = point;
+		}
+	}
+
+	override public function onSeingAllyKilled(point:FlxPoint)
+	{
+		everBeenEnraged = true;
+		swarmTimer = FlxG.random.int(5, 8);
+		state = SWARMING;
+		playerPosition = point;
 	}
 
 	function idleBehavior(elapsed:Float)
@@ -69,6 +92,17 @@ class Miasma extends Enemy
 
 	function swarmingBehavior(elapsed:Float)
 	{
-		FlxVelocity.moveTowardsPoint(this, playerPosition, Std.int(SPEED));
+		if (swarmTimer > 0)
+		{
+			if (this.getPosition().distanceTo(playerPosition) > 10)
+			{
+				FlxVelocity.moveTowardsPoint(this, playerPosition, Std.int(SPEED));
+			}
+			swarmTimer -= elapsed;
+		}
+		else
+		{
+			state = IDLE;
+		}
 	}
 }
