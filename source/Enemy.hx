@@ -13,6 +13,7 @@ enum State
 {
 	IDLE;
 	SWARMING;
+	RUNNING;
 }
 
 class Enemy extends FlxSprite
@@ -55,6 +56,17 @@ class Enemy extends FlxSprite
 			animation.play("idle");
 		}
 		super.update(elapsed);
+	}
+
+	public function onBeingInjured(point:FlxPoint)
+	{
+		this.flicker();
+	}
+
+	public function onEnemyContact(point:FlxPoint)
+	{
+		// Placeholder for custom logic when contacting an enemy (damage agnostic)
+		return;
 	}
 
 	public function onSeeingEnemyEntity(point:FlxPoint)

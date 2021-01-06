@@ -2,6 +2,7 @@ package;
 
 import enemy_library.Crab;
 import enemy_library.Miasma;
+import enemy_library.SandCreep;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxState;
@@ -139,6 +140,8 @@ class TestState extends FlxState
 				enemies.add(new Miasma(x, y));
 			case "crab":
 				enemies.add(new Crab(x, y));
+			case "sand_creep":
+				enemies.add(new SandCreep(x, y));
 			default: // Assume everything else is an enemy
 				enemies.add(new Enemy(x, y, entity.name));
 		}
@@ -186,7 +189,7 @@ class TestState extends FlxState
 					}
 					enemy.kill();
 				}
-				enemy.flicker();
+				enemy.onBeingInjured(player.getMidpoint());
 			}
 			else
 			{
@@ -196,6 +199,7 @@ class TestState extends FlxState
 			}
 		}
 		FlxG.collide(player, enemy);
+		enemy.onEnemyContact(player.getMidpoint());
 	}
 
 	// Functions determining enemy characteristics (such as seeing the player)
