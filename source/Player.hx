@@ -15,11 +15,23 @@ enum WeaponType
 	BOW;
 }
 
+enum PlayerState
+{
+	IDLE;
+	ATTACKING;
+	ATTACK_COOLDOWN;
+	DAMAGED;
+}
+
 class Player extends FlxSprite
 {
 	var player:Player;
-	var weapon:WeaponType;
+	var equippedWeapon:WeaponType;
 	var unlockedItems:Map<ItemType, Bool>; // We need something to represent unlocking items via pickups
+
+	var state:PlayerState;
+	var attackTimer:Float;
+	var attackDelayTimer:Float;
 
 	// var stepSound:FlxSound;
 	static inline var SPEED:Float = 100;
@@ -28,25 +40,28 @@ class Player extends FlxSprite
 	{
 		super(x, y);
 		this.health = 3; // Initial health is 3
-		this.weapon = WeaponType.NONE;
+		this.equippedWeapon = WeaponType.NONE;
 		this.unlockedItems = [];
 		loadGraphic(AssetPaths.Sprites2__png, true, 10, 10);
 		animation.add("idle", [0, 2, 0, 3, 1], 6, false);
 		animation.add("sword_idle", [5, 6, 7, 8], 6, false);
 		animation.add("bow_idle", [10, 11, 12, 13], 6, false);
-		animation.add("basic_attack", [4, 4, 0], 6, false);
-		animation.add("sword_attack", [9, 5, 9, 5], 6, false);
+		animation.add("basic_attack", [4, 4, 4], 6, false);
+		animation.add("sword_attack", [9, 5, 5], 6, false);
 		animation.add("bow_attack", [14, 14, 13], 6, false);
 
 		drag.x = drag.y = 1600;
 		setSize(6, 7);
 		offset.set(2, 3);
+		state = IDLE;
 		// stepSound = FlxG.sound.load(AssetPaths.step__wav);
 	}
 
 	override function update(elapsed:Float)
 	{
+		updateState(elapsed);
 		updateMovement();
+		updatePlayerAnimation();
 		super.update(elapsed);
 	}
 
@@ -56,18 +71,12 @@ class Player extends FlxSprite
 		var down:Bool = false;
 		var left:Bool = false;
 		var right:Bool = false;
-		var use:Bool = false;
-		var equip_1:Bool = false;
-		var equip_2:Bool = false;
 
 		#if FLX_KEYBOARD
 		up = FlxG.keys.anyPressed([UP, W]);
 		down = FlxG.keys.anyPressed([DOWN, S]);
 		left = FlxG.keys.anyPressed([LEFT, A]);
 		right = FlxG.keys.anyPressed([RIGHT, D]);
-		use = FlxG.keys.anyPressed([SPACE]);
-		equip_1 = FlxG.keys.anyPressed([ONE]); // Sword Button
-		equip_2 = FlxG.keys.anyPressed([TWO]); // Bow Button
 		#end
 		#if mobile
 		var virtualPad = PlayState.virtualPad;
@@ -76,9 +85,6 @@ class Player extends FlxSprite
 		left = left || virtualPad.buttonLeft.pressed;
 		right = right || virtualPad.buttonRight.pressed;
 		#end
-
-		if (equip_1 && equip_2)
-			equip_1 = equip_2 = false;
 
 		if (up && down)
 			up = down = false;
@@ -121,11 +127,25 @@ class Player extends FlxSprite
 			velocity.set(SPEED, 0);
 			velocity.rotate(FlxPoint.weak(0, 0), newAngle);
 		}
+	}
+
+	function updatePlayerAnimation()
+	{
+		var equip_1:Bool = false;
+		var equip_2:Bool = false;
+
+		#if FLX_KEYBOARD
+		equip_1 = FlxG.keys.anyPressed([ONE]); // Sword Button
+		equip_2 = FlxG.keys.anyPressed([TWO]); // Bow Button
+		#end
+
+		if (state != IDLE || (equip_1 && equip_2))
+			equip_1 = equip_2 = false;
 
 		// 1. Animating an attack is the highest priority
-		if (use)
+		if (state == ATTACKING)
 		{
-			switch (weapon)
+			switch (equippedWeapon)
 			{
 				case NONE:
 					animation.play("basic_attack");
@@ -164,7 +184,7 @@ class Player extends FlxSprite
 		// 4. Animating the idle player is the last priority
 		else if (animation.finished)
 		{
-			switch (weapon)
+			switch (equippedWeapon)
 			{
 				case NONE:
 					animation.play("idle");
@@ -176,19 +196,69 @@ class Player extends FlxSprite
 		}
 	}
 
+	function updateState(elapsed:Float)
+	{
+		var use:Bool = false;
+
+		#if FLX_KEYBOARD
+		use = FlxG.keys.anyPressed([SPACE]);
+		#end
+
+		if (use && state == IDLE)
+		{
+			// Add a switch statement here to make attack timer change behavior based on equipped weapon
+			state = ATTACKING;
+			switch (equippedWeapon)
+			{
+				case NONE:
+					attackTimer = 0.3;
+				case SWORD:
+					attackTimer = 0.2;
+				case BOW:
+					attackTimer = 0.1;
+			}
+		}
+		else if (state == ATTACKING)
+		{
+			attackTimer -= elapsed;
+			if (attackTimer < 0)
+			{
+				// Same here for the cooldown
+				state = ATTACK_COOLDOWN;
+				switch (equippedWeapon)
+				{
+					case NONE:
+						attackDelayTimer = 0.5;
+					case SWORD:
+						attackDelayTimer = 0.3;
+					case BOW:
+						attackDelayTimer = 0.8;
+				}
+			}
+		}
+		else if (state == ATTACK_COOLDOWN)
+		{
+			attackDelayTimer -= elapsed;
+			if (attackDelayTimer < 0)
+			{
+				state = IDLE;
+			}
+		}
+	}
+
 	// We'll need to add logic to handle switching weapons after unlocking them
 	public function changeWeapon(weapon:WeaponType)
 	{
-		if (this.weapon != weapon)
+		if (this.equippedWeapon != weapon)
 		{
 			switch (weapon)
 			{
 				case NONE:
-					this.weapon = NONE;
+					this.equippedWeapon = NONE;
 				case SWORD:
-					this.weapon = SWORD;
+					this.equippedWeapon = SWORD;
 				case BOW:
-					this.weapon = BOW;
+					this.equippedWeapon = BOW;
 			}
 		}
 	}
@@ -196,17 +266,10 @@ class Player extends FlxSprite
 	public function unlockItem(item:Item.ItemType)
 	{
 		unlockedItems[item] = true;
-		switch (item)
-		{
-			case SWORD:
-				changeWeapon(SWORD);
-			case BOW:
-				changeWeapon(BOW);
-		}
 	}
 
 	public function activeDamageAura():Bool
 	{
-		return StringTools.endsWith(this.animation.name, "attack");
+		return attackTimer > 0;
 	}
 }
