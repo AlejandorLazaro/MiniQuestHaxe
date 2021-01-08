@@ -9,14 +9,14 @@ import flixel.system.FlxSound;
 
 using flixel.util.FlxSpriteUtil;
 
-enum EnemyState
+enum NPCState
 {
 	IDLE;
 	SWARMING;
 	RUNNING;
 }
 
-class Enemy extends FlxSprite
+class NPC extends FlxSprite
 {
 	static inline var SPEED:Float = 80;
 
@@ -26,8 +26,9 @@ class Enemy extends FlxSprite
 	var enemyMaxHealth:Int;
 	var idleTimer:Float;
 	var moveDirection:Float;
+	var startingOrigin:FlxPoint;
 
-	public var state:EnemyState;
+	public var state:NPCState;
 	public var seesPlayer:Bool;
 	public var playerPosition:FlxPoint;
 
@@ -37,12 +38,13 @@ class Enemy extends FlxSprite
 		if (name != "preconfigured") // Only set values when another inherited class didn't already do it
 		{
 			setPropertiesForName(name);
-			animation.add("idle", [0, 1], 6, false);
+			animation.add("idle", [0, 1], 2, false);
 			drag.x = drag.y = 10;
 			width = 10;
 			height = 10;
-
+			startingOrigin = new FlxPoint(x + origin.x, y + origin.y);
 			idleTimer = 0;
+
 			playerPosition = FlxPoint.get();
 		}
 	}
@@ -54,31 +56,16 @@ class Enemy extends FlxSprite
 			if (this.isFlickering())
 				return;
 			animation.play("idle");
+			if (this.getMidpoint().distanceTo(startingOrigin) > 1)
+			{
+				FlxVelocity.moveTowardsPoint(this, startingOrigin, SPEED);
+			}
+			else
+			{
+				this.velocity.x = this.velocity.y = 0;
+			}
 		}
 		super.update(elapsed);
-	}
-
-	public function onBeingInjured(point:FlxPoint)
-	{
-		this.flicker();
-	}
-
-	public function onEnemyContact(point:FlxPoint)
-	{
-		// Placeholder for custom logic when contacting an enemy (damage agnostic)
-		return;
-	}
-
-	public function onSeeingEnemyEntity(point:FlxPoint)
-	{
-		state = SWARMING;
-		playerPosition = point;
-	}
-
-	public function onSeingAllyKilled(point:FlxPoint)
-	{
-		// No-op for most enemies
-		return;
 	}
 
 	function setPropertiesForName(name:String)
@@ -87,20 +74,11 @@ class Enemy extends FlxSprite
 		this.name = name;
 		switch (name)
 		{
-			case "miasma":
-				graphic = AssetPaths.Miasma__png;
-				enemyMaxHealth = 2;
-			case "fire_ant":
-				graphic = AssetPaths.FireAnt__png;
-				enemyMaxHealth = 5;
-			case "crab":
-				graphic = AssetPaths.Crab__png;
-				enemyMaxHealth = 2;
-			case "sand_creep":
-				graphic = AssetPaths.SandCreep__png;
-				enemyMaxHealth = 3;
+			case "king":
+				graphic = AssetPaths.King__png;
+			case "princess":
+				graphic = AssetPaths.Princess__png;
 		}
-		health = enemyMaxHealth;
 		loadGraphic(graphic, true, 10, 10);
 	}
 }

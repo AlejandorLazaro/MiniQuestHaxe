@@ -1,8 +1,6 @@
 package;
 
-import enemy_library.Crab;
 import enemy_library.Miasma;
-import enemy_library.SandCreep;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxState;
@@ -14,22 +12,21 @@ import flixel.util.FlxColor;
 
 using flixel.util.FlxSpriteUtil;
 
-class TestState extends FlxState
+class CastleState extends FlxState
 {
 	var player:Player;
-	var castle:Castle;
 	var enemies:FlxTypedGroup<Enemy>;
+	var npcs:FlxTypedGroup<NPC>;
 	var map:FlxOgmo3Loader;
 	var hud:HUD;
 	var items:FlxTypedGroup<Item>;
 	var overworld:FlxTilemap;
 	var ending:Bool;
-	// var won:Bool; // This will always be false for our Test state
 	var endButton:FlxButton;
 
 	override public function create()
 	{
-		map = new FlxOgmo3Loader(AssetPaths.miniQuest__ogmo, AssetPaths.test__json);
+		map = new FlxOgmo3Loader(AssetPaths.miniQuest__ogmo, AssetPaths.castle__json);
 		overworld = map.loadTilemap(AssetPaths.TileTextures2__png, "overworld");
 		overworld.follow();
 		overworld.setTileProperties(1, FlxObject.NONE); // Grass
@@ -56,29 +53,20 @@ class TestState extends FlxState
 		overworld.setTileProperties(22, FlxObject.ANY); // Fruit Tree
 		add(overworld);
 
-		// coins = new FlxTypedGroup<Coin>();
-		// coinSound = FlxG.sound.load(AssetPaths.coin__wav);
-		// add(coins);
-
-		items = new FlxTypedGroup<Item>();
-		add(items);
-
 		enemies = new FlxTypedGroup<Enemy>();
 		add(enemies);
 
-		castle = new Castle();
+		npcs = new FlxTypedGroup<NPC>();
+		add(npcs);
+
 		player = new Player();
 		map.loadEntities(placeEntities, "entities");
-		add(castle);
 		add(player);
 
 		FlxG.camera.follow(player, TOPDOWN, 1);
 
 		hud = new HUD();
 		add(hud);
-
-		// combatHud = new CombatHUD();
-		// add(combatHud);
 
 		#if mobile
 		virtualPad = new FlxVirtualPad(FULL, NONE);
@@ -90,7 +78,6 @@ class TestState extends FlxState
 		endButton = new FlxButton(0, 0, "End Test", doneFadeOut);
 		endButton.x = (FlxG.width - 20) - endButton.width - 10;
 		endButton.y = FlxG.height - endButton.height - 10;
-		// endButton.onUp.sound = FlxG.sound.load(AssetPaths.select__wav);
 		add(endButton);
 
 		super.create();
@@ -105,13 +92,12 @@ class TestState extends FlxState
 		}
 		else
 		{
-			FlxG.overlap(player, items, playerTouchItem);
-			FlxG.overlap(player, castle, playerTouchCastle);
 			FlxG.collide(player, overworld);
 			FlxG.collide(enemies, overworld);
-			FlxG.collide(enemies, enemies);
+			FlxG.collide(npcs, overworld);
+			FlxG.collide(player, npcs);
+			FlxG.collide(npcs, npcs);
 			enemies.forEachAlive(checkEnemyVision);
-			FlxG.overlap(player, enemies, playerTouchEnemy);
 			if (player.health == 0)
 			{
 				player.kill();
@@ -130,80 +116,13 @@ class TestState extends FlxState
 		{
 			case "player":
 				player.setPosition(x, y);
-			case "sword":
-				items.add(new Item(x, y, SWORD));
-			case "bow":
-				items.add(new Item(x, y, BOW));
-			case "castle":
-				castle.setPosition(x, y);
-			case "miasma":
-				enemies.add(new Miasma(x, y));
-			case "crab":
-				enemies.add(new Crab(x, y));
-			case "sand_creep":
-				enemies.add(new SandCreep(x, y));
+			case "king":
+				npcs.add(new NPC(x, y, entity.name));
+			case "princess":
+				npcs.add(new NPC(x, y, entity.name));
 			default: // Assume everything else is an enemy
 				enemies.add(new Enemy(x, y, entity.name));
 		}
-	}
-
-	// Functions determining collision effects
-
-	function playerTouchItem(player:Player, item:Item)
-	{
-		if (player.alive && player.exists && item.alive && item.exists)
-		{
-			player.unlockItem(item.type);
-			hud.unlockItem(item.type);
-			item.kill();
-		}
-	}
-
-	function playerTouchCastle(player:Player, castle:Castle)
-	{
-		if (player.alive && player.exists && castle.alive && castle.exists)
-		{
-			FlxG.camera.fade(FlxColor.BLACK, 0.33, false, function()
-			{
-				FlxG.switchState(new CastleState());
-			});
-			player.health = 0; // Placeholder logic that kills the player until we have something meaningful happening with the castle, like loading a new level/area
-		}
-	}
-
-	function playerTouchEnemy(player:Player, enemy:Enemy)
-	{
-		if (player.alive && player.exists && enemy.alive && enemy.exists && !player.isFlickering() && !enemy.isFlickering())
-		{
-			// Add logic to deal with whether the player or the enemy takes damage
-			// For now, the enemy will always just die. Lol.
-			//
-			// Eventually make this return a numeric value to change the damage enemies take,
-			// since it'd be nice to have different damage values (upgrades, etc)
-			if (player.activeDamageAura())
-			{
-				enemy.health--;
-				if (enemy.health == 0)
-				{
-					// This is special behavior that allows Miasma enemies to
-					// swarm if they see the player kill another Miasma entity
-					if (Type.getClass(enemy) == Miasma)
-					{
-						enemies.forEachOfType(Miasma, checkSeenEnemyKilled);
-					}
-					enemy.kill();
-				}
-				enemy.onBeingInjured(player.getMidpoint());
-			}
-			else
-			{
-				player.health--;
-				hud.updateHealth(Std.int(player.health));
-				player.flicker();
-			}
-		}
-		FlxG.collide(player, enemy);
-		enemy.onEnemyContact(player.getMidpoint());
 	}
 
 	// Functions determining enemy characteristics (such as seeing the player)
@@ -213,7 +132,8 @@ class TestState extends FlxState
 		if (overworld.ray(enemy.getMidpoint(), player.getMidpoint()))
 		{
 			enemy.seesPlayer = true;
-			enemy.onSeeingEnemyEntity(player.getMidpoint());
+			enemy.playerPosition = player.getMidpoint();
+			enemy.state = SWARMING;
 		}
 		else
 		{
@@ -221,12 +141,12 @@ class TestState extends FlxState
 		}
 	}
 
-	function checkSeenEnemyKilled(enemy:Enemy)
+	function transitionToCastleExterior()
 	{
-		if (enemy.seesPlayer == true)
+		FlxG.camera.fade(FlxColor.BLACK, 0.33, false, function()
 		{
-			enemy.onSeingAllyKilled(player.getMidpoint());
-		}
+			FlxG.switchState(new TestState());
+		});
 	}
 
 	function doneFadeOut()
