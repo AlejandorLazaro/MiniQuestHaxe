@@ -22,11 +22,10 @@ class Enemy extends FlxSprite
 
 	var name:String;
 
-	// These variables will be used to track the enemySprite's health
-	var enemyMaxHealth:Int;
 	var idleTimer:Float;
 	var moveDirection:Float;
 
+	public var enemyMaxHealth:Int;
 	public var isAggressive:Bool = false;
 	public var state:EnemyState;
 	public var seesPlayer:Bool;
@@ -62,6 +61,7 @@ class Enemy extends FlxSprite
 	public function onBeingInjured(point:FlxPoint)
 	{
 		this.flicker();
+		health--;
 	}
 
 	public function onEnemyContact(point:FlxPoint)

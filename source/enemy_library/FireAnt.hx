@@ -58,6 +58,13 @@ class FireAnt extends Enemy
 		}
 	}
 
+	override public function onBeingInjured(point:FlxPoint)
+	{
+		this.flicker();
+		health--;
+		isAggressive = true;
+	}
+
 	function idleBehavior(elapsed:Float)
 	{
 		if (idleTimer <= 0)

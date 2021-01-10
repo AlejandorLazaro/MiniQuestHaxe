@@ -68,13 +68,14 @@ class SandCreep extends Enemy
 
 	override public function onBeingInjured(point:FlxPoint)
 	{
+		this.flicker();
+		health--;
 		everBeenInjured = true;
 		state = RUNNING;
 		runningTimer = FlxG.random.int(2, 3);
 		var angleToAttacker = this.getMidpoint().angleBetween(point);
 		velocity.set(SPEED * 2, 0);
 		velocity.rotate(FlxPoint.weak(0, 0), -angleToAttacker);
-		this.flicker();
 	}
 
 	override public function onEnemyContact(point:FlxPoint)
