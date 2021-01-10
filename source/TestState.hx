@@ -1,6 +1,7 @@
 package;
 
 import enemy_library.Crab;
+import enemy_library.FireAnt;
 import enemy_library.Miasma;
 import enemy_library.SandCreep;
 import flixel.FlxG;
@@ -142,6 +143,8 @@ class TestState extends FlxState
 				enemies.add(new Crab(x, y));
 			case "sand_creep":
 				enemies.add(new SandCreep(x, y));
+			case "fire_ant":
+				enemies.add(new FireAnt(x, y));
 			default: // Assume everything else is an enemy
 				enemies.add(new Enemy(x, y, entity.name));
 		}

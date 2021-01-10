@@ -1,6 +1,6 @@
 package;
 
-import enemy_library.Miasma;
+import enemy_library.FireAnt;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxState;
@@ -97,6 +97,7 @@ class CastleState extends FlxState
 			FlxG.collide(npcs, overworld);
 			FlxG.collide(player, npcs);
 			FlxG.collide(npcs, npcs);
+			FlxG.collide(enemies, enemies);
 			enemies.forEachAlive(checkEnemyVision);
 			if (player.health == 0)
 			{
@@ -120,6 +121,8 @@ class CastleState extends FlxState
 				npcs.add(new NPC(x, y, entity.name));
 			case "princess":
 				npcs.add(new NPC(x, y, entity.name));
+			case "fire_ant":
+				enemies.add(new FireAnt(x, y));
 			default: // Assume everything else is an enemy
 				enemies.add(new Enemy(x, y, entity.name));
 		}
@@ -132,8 +135,7 @@ class CastleState extends FlxState
 		if (overworld.ray(enemy.getMidpoint(), player.getMidpoint()))
 		{
 			enemy.seesPlayer = true;
-			enemy.playerPosition = player.getMidpoint();
-			enemy.state = SWARMING;
+			enemy.onSeeingEnemyEntity(player.getMidpoint());
 		}
 		else
 		{

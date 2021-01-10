@@ -27,6 +27,7 @@ class Enemy extends FlxSprite
 	var idleTimer:Float;
 	var moveDirection:Float;
 
+	public var isAggressive:Bool = false;
 	public var state:EnemyState;
 	public var seesPlayer:Bool;
 	public var playerPosition:FlxPoint;
