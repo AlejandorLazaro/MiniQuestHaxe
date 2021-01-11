@@ -19,7 +19,6 @@ using flixel.util.FlxSpriteUtil;
 class SingleEnemyState extends FlxState
 {
 	var player:Player;
-	var castle:Castle;
 	var enemies:FlxTypedGroup<Enemy>;
 	var enemyHealthBars:FlxTypedGroup<FlxBar>;
 
@@ -28,7 +27,6 @@ class SingleEnemyState extends FlxState
 	var items:FlxTypedGroup<Item>;
 	var overworld:FlxTilemap;
 	var ending:Bool;
-	// var won:Bool; // This will always be false for our Test state
 	var endButton:FlxButton;
 
 	override public function create()
@@ -37,32 +35,9 @@ class SingleEnemyState extends FlxState
 		overworld = map.loadTilemap(AssetPaths.TileTextures2__png, "overworld");
 		overworld.follow();
 		overworld.setTileProperties(1, FlxObject.NONE); // Grass
-		overworld.setTileProperties(2, FlxObject.ANY); // Ice Block
 		overworld.setTileProperties(3, FlxObject.ANY); // Boulder
-		overworld.setTileProperties(4, FlxObject.NONE); // Beach Sand
-		overworld.setTileProperties(5, FlxObject.NONE); // Craggy Ground
-		overworld.setTileProperties(6, FlxObject.NONE); // Desert Sand
-		overworld.setTileProperties(7, FlxObject.NONE); // Dirt
-		overworld.setTileProperties(8, FlxObject.ANY); // Water
-		overworld.setTileProperties(9, FlxObject.ANY); // Brown Boulder
-		overworld.setTileProperties(10, FlxObject.NONE); // Upheaved Desert Sand
-		overworld.setTileProperties(11, FlxObject.NONE); // Flowers
-		overworld.setTileProperties(12, FlxObject.NONE); // Metal Floor
-		overworld.setTileProperties(13, FlxObject.NONE); // Bleached Road
-		overworld.setTileProperties(14, FlxObject.NONE); // Wooden Board
-		overworld.setTileProperties(15, FlxObject.ANY); // Shell
 		overworld.setTileProperties(16, FlxObject.ANY); // Tree
-		overworld.setTileProperties(17, FlxObject.ANY); // Sky
-		overworld.setTileProperties(18, FlxObject.ANY); // Cloud
-		overworld.setTileProperties(19, FlxObject.NONE); // Dark Grass
-		overworld.setTileProperties(20, FlxObject.ANY); // Dark Tree
-		overworld.setTileProperties(21, FlxObject.NONE); // Golden Road
-		overworld.setTileProperties(22, FlxObject.ANY); // Fruit Tree
 		add(overworld);
-
-		// coins = new FlxTypedGroup<Coin>();
-		// coinSound = FlxG.sound.load(AssetPaths.coin__wav);
-		// add(coins);
 
 		items = new FlxTypedGroup<Item>();
 		add(items);
@@ -74,32 +49,12 @@ class SingleEnemyState extends FlxState
 		map.loadEntities(placeEntities, "entities");
 		add(player);
 
-		FlxG.log.add("[Player] X: " + player.x + "; Y: " + player.y);
-
 		hud = new HUD();
 		add(hud);
 
 		FlxG.camera.follow(player, TOPDOWN, 1);
 
 		enemies.forEach(hud.addNewEnemyHealthBar);
-		// for (enemy in enemies)
-		// {
-		// 	hud.addNewEnemyHealthBar(enemy);
-		// 	// var enemyHealthBar = new FlxBar(enemy.x + -5, enemy.y + 2, LEFT_TO_RIGHT, 12, 2, enemy);
-		// 	// var enemyHealthBar = new FlxBar(50, 0, LEFT_TO_RIGHT, 12, 2, enemy);
-		// 	// 	// create and add a FlxBar to show the enemySprite's health. We'll make it Red and Yellow.
-		// 	// 	// enemyHealthBar = new FlxBar(enemySprite.x - 6, playerHealthCounter.y, LEFT_TO_RIGHT, 20, 10);
-		// 	// enemyHealthBar.value = 100; // the enemySprite's health bar starts at 100%
-		// 	// enemyHealthBar.killOnEmpty = true;
-		// 	// 	enemyHealthBar.createFilledBar(0xffdc143c, FlxColor.YELLOW, true, FlxColor.YELLOW);
-		// 	// enemyHealthBar.createFilledBar(FlxColor.BLACK, FlxColor.RED, true, FlxColor.WHITE);
-		// 	// hud.enemyHealthBars[enemy] = enemyHealthBar;
-		// 	// FlxG.log.add("Initial enemy health bar = " + hud.enemyHealthBars[enemy]);
-		// 	// hud.add(enemyHealthBar);
-		// }
-
-		// combatHud = new CombatHUD();
-		// add(combatHud);
 
 		#if mobile
 		virtualPad = new FlxVirtualPad(FULL, NONE);
@@ -111,7 +66,6 @@ class SingleEnemyState extends FlxState
 		endButton = new FlxButton(0, 0, "End Test", doneFadeOut);
 		endButton.x = (FlxG.width - 20) - endButton.width - 10;
 		endButton.y = FlxG.height - endButton.height - 10;
-		// endButton.onUp.sound = FlxG.sound.load(AssetPaths.select__wav);
 		add(endButton);
 
 		super.create();
@@ -126,11 +80,8 @@ class SingleEnemyState extends FlxState
 		}
 		else
 		{
-			FlxG.overlap(player, items, playerTouchItem);
-			FlxG.overlap(player, castle, playerTouchCastle);
 			FlxG.collide(player, overworld);
 			FlxG.collide(enemies, overworld);
-			FlxG.collide(enemies, enemies);
 			enemies.forEachAlive(checkEnemyVision);
 			FlxG.overlap(player, enemies, playerTouchEnemy);
 			if (player.health == 0)
@@ -151,48 +102,12 @@ class SingleEnemyState extends FlxState
 		{
 			case "player":
 				player.setPosition(x, y);
-			case "sword":
-				items.add(new Item(x, y, SWORD));
-			case "bow":
-				items.add(new Item(x, y, BOW));
-			case "castle":
-				castle.setPosition(x, y);
-			case "miasma":
-				enemies.add(new Miasma(x, y));
-			case "crab":
-				enemies.add(new Crab(x, y));
-			case "sand_creep":
-				enemies.add(new SandCreep(x, y));
 			case "fire_ant":
 				enemies.add(new FireAnt(x, y));
-			default: // Assume everything else is an enemy
-				enemies.add(new Enemy(x, y, entity.name));
 		}
 	}
 
 	// Functions determining collision effects
-
-	function playerTouchItem(player:Player, item:Item)
-	{
-		if (player.alive && player.exists && item.alive && item.exists)
-		{
-			player.unlockItem(item.type);
-			hud.unlockItem(item.type);
-			item.kill();
-		}
-	}
-
-	function playerTouchCastle(player:Player, castle:Castle)
-	{
-		if (player.alive && player.exists && castle.alive && castle.exists)
-		{
-			FlxG.camera.fade(FlxColor.BLACK, 0.33, false, function()
-			{
-				FlxG.switchState(new CastleState());
-			});
-			player.health = 0; // Placeholder logic that kills the player until we have something meaningful happening with the castle, like loading a new level/area
-		}
-	}
 
 	function playerTouchEnemy(player:Player, enemy:Enemy)
 	{
@@ -249,6 +164,8 @@ class SingleEnemyState extends FlxState
 			enemy.onSeingAllyKilled(player.getMidpoint());
 		}
 	}
+
+	// State change functions (E.g.: Game over)
 
 	function doneFadeOut()
 	{
