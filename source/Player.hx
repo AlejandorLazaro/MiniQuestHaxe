@@ -219,6 +219,16 @@ class Player extends FlxSprite
 					attackTimer = 0.2;
 				case BOW:
 					attackTimer = 0.1;
+					// Add projectile logic
+					var arrow:FlxSprite = TestState.arrows.recycle();
+					arrow.reset(x + (width - arrow.width) / 2, y + (height - arrow.height) / 2);
+					arrow.angle = angle;
+
+					arrow.velocity.set(150, 0);
+					arrow.velocity.rotate(FlxPoint.weak(0, 0), arrow.angle);
+
+					arrow.velocity.x *= 2;
+					arrow.velocity.y *= 2;
 			}
 		}
 		else if (state == ATTACKING)

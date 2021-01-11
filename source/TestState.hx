@@ -6,6 +6,7 @@ import enemy_library.Miasma;
 import enemy_library.SandCreep;
 import flixel.FlxG;
 import flixel.FlxObject;
+import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.addons.editors.ogmo.FlxOgmo3Loader;
 import flixel.group.FlxGroup.FlxTypedGroup;
@@ -17,6 +18,9 @@ using flixel.util.FlxSpriteUtil;
 
 class TestState extends FlxState
 {
+	// public static var arrows:FlxTypedGroup<Arrow>;
+	public static var arrows:FlxTypedGroup<FlxSprite>;
+
 	var player:Player;
 	var castle:Castle;
 	var enemies:FlxTypedGroup<Enemy>;
@@ -72,6 +76,27 @@ class TestState extends FlxState
 		map.loadEntities(placeEntities, "entities");
 		add(castle);
 		add(player);
+
+		var poolSize:Int = 10;
+		// var arrow:Arrow;
+		var sprite:FlxSprite;
+		arrows = new FlxTypedGroup<FlxSprite>(poolSize);
+		for (i in 0...poolSize)
+		{
+			// arrow = new Arrow();
+
+			sprite = new FlxSprite(-100, -100);
+			sprite.makeGraphic(8, 2);
+			sprite.width = 10;
+			sprite.height = 10;
+			sprite.offset.set(-1, -4);
+			sprite.exists = false;
+
+			// arrows.add(arrow);
+
+			arrows.add(sprite);
+		}
+		add(arrows);
 
 		FlxG.camera.follow(player, TOPDOWN, 1);
 
