@@ -62,9 +62,6 @@ class Player extends FlxSprite
 		offset.set(2, 3);
 		state = IDLE;
 		// stepSound = FlxG.sound.load(AssetPaths.step__wav);
-
-		FlxG.watch.add(this, "aimingInPlace");
-		FlxG.watch.add(this, "strafingActive");
 	}
 
 	override function update(elapsed:Float)
@@ -73,7 +70,6 @@ class Player extends FlxSprite
 		updateMovement();
 		updatePlayerAnimation();
 		super.update(elapsed);
-		FlxG.watch.add(this, "aimingInPlace");
 	}
 
 	function updateMovement()

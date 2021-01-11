@@ -87,9 +87,9 @@ class TestState extends FlxState
 
 			sprite = new FlxSprite(-100, -100);
 			sprite.makeGraphic(8, 2);
-			sprite.width = 10;
-			sprite.height = 10;
-			sprite.offset.set(-1, -4);
+			sprite.width = 2;
+			sprite.height = 2;
+			sprite.offset.set(3, 0);
 			sprite.exists = false;
 
 			// arrows.add(arrow);
@@ -138,6 +138,8 @@ class TestState extends FlxState
 			FlxG.collide(player, overworld);
 			FlxG.collide(enemies, overworld);
 			FlxG.collide(enemies, enemies);
+			FlxG.collide(arrows, overworld);
+			FlxG.overlap(arrows, enemies, arrowTouchEnemy);
 			enemies.forEachAlive(shouldBeActive);
 			enemies.forEachAlive(checkEnemyVision);
 			FlxG.overlap(player, enemies, playerTouchEnemy);
@@ -235,6 +237,26 @@ class TestState extends FlxState
 		}
 		FlxG.collide(player, enemy);
 		enemy.onEnemyContact(player.getMidpoint());
+	}
+
+	function arrowTouchEnemy(arrow:FlxSprite, enemy:Enemy)
+	{
+		if (arrow.alive && arrow.exists && enemy.alive && enemy.exists && !enemy.isFlickering())
+		{
+			enemy.onBeingInjured(player.getMidpoint());
+			hud.updateEnemyHealthBar(enemy, Std.int(enemy.health), enemy.enemyMaxHealth);
+			if (enemy.health == 0)
+			{
+				// This is special behavior that allows Miasma enemies to
+				// swarm if they see the player kill another Miasma entity
+				if (Type.getClass(enemy) == Miasma)
+				{
+					enemies.forEachOfType(Miasma, checkSeenEnemyKilled);
+				}
+				enemy.kill();
+			}
+		}
+		arrow.kill();
 	}
 
 	// Functions determining enemy characteristics (such as seeing the player)
