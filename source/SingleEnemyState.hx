@@ -10,7 +10,6 @@ import flixel.FlxState;
 import flixel.addons.editors.ogmo.FlxOgmo3Loader;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.tile.FlxTilemap;
-import flixel.ui.FlxBar;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
 
@@ -21,7 +20,6 @@ class SingleEnemyState extends FlxState
 	var player:Player;
 	var castle:Castle;
 	var enemies:FlxTypedGroup<Enemy>;
-	var enemyHealthBars:FlxTypedGroup<FlxBar>;
 
 	var map:FlxOgmo3Loader;
 	var hud:HUD;
@@ -74,29 +72,12 @@ class SingleEnemyState extends FlxState
 		map.loadEntities(placeEntities, "entities");
 		add(player);
 
-		FlxG.log.add("[Player] X: " + player.x + "; Y: " + player.y);
+		FlxG.camera.follow(player, TOPDOWN, 1);
 
 		hud = new HUD();
 		add(hud);
 
-		FlxG.camera.follow(player, TOPDOWN, 1);
-
 		enemies.forEach(hud.addNewEnemyHealthBar);
-		// for (enemy in enemies)
-		// {
-		// 	hud.addNewEnemyHealthBar(enemy);
-		// 	// var enemyHealthBar = new FlxBar(enemy.x + -5, enemy.y + 2, LEFT_TO_RIGHT, 12, 2, enemy);
-		// 	// var enemyHealthBar = new FlxBar(50, 0, LEFT_TO_RIGHT, 12, 2, enemy);
-		// 	// 	// create and add a FlxBar to show the enemySprite's health. We'll make it Red and Yellow.
-		// 	// 	// enemyHealthBar = new FlxBar(enemySprite.x - 6, playerHealthCounter.y, LEFT_TO_RIGHT, 20, 10);
-		// 	// enemyHealthBar.value = 100; // the enemySprite's health bar starts at 100%
-		// 	// enemyHealthBar.killOnEmpty = true;
-		// 	// 	enemyHealthBar.createFilledBar(0xffdc143c, FlxColor.YELLOW, true, FlxColor.YELLOW);
-		// 	// enemyHealthBar.createFilledBar(FlxColor.BLACK, FlxColor.RED, true, FlxColor.WHITE);
-		// 	// hud.enemyHealthBars[enemy] = enemyHealthBar;
-		// 	// FlxG.log.add("Initial enemy health bar = " + hud.enemyHealthBars[enemy]);
-		// 	// hud.add(enemyHealthBar);
-		// }
 
 		// combatHud = new CombatHUD();
 		// add(combatHud);

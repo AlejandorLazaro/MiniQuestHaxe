@@ -78,6 +78,8 @@ class TestState extends FlxState
 		hud = new HUD();
 		add(hud);
 
+		enemies.forEach(hud.addNewEnemyHealthBar);
+
 		// combatHud = new CombatHUD();
 		// add(combatHud);
 

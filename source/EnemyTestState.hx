@@ -1,6 +1,7 @@
 package;
 
 import enemy_library.Crab;
+import enemy_library.FireAnt;
 import enemy_library.Miasma;
 import enemy_library.SandCreep;
 import flixel.FlxG;
@@ -74,6 +75,8 @@ class EnemyTestState extends FlxState
 		hud = new HUD();
 		add(hud);
 
+		enemies.forEach(hud.addNewEnemyHealthBar);
+
 		// combatHud = new CombatHUD();
 		// add(combatHud);
 
@@ -136,6 +139,8 @@ class EnemyTestState extends FlxState
 				enemies.add(new Crab(x, y));
 			case "sand_creep":
 				enemies.add(new SandCreep(x, y));
+			case "fire_ant":
+				enemies.add(new FireAnt(x, y));
 			default: // Assume everything else is an enemy
 				enemies.add(new Enemy(x, y, entity.name));
 		}
@@ -165,7 +170,7 @@ class EnemyTestState extends FlxState
 			if (player.activeDamageAura())
 			{
 				enemy.onBeingInjured(player.getMidpoint());
-				hud.updateEnemyHealth(enemy, Std.int(enemy.health), enemy.enemyMaxHealth);
+				hud.updateEnemyHealthBar(enemy, Std.int(enemy.health), enemy.enemyMaxHealth);
 				if (enemy.health == 0)
 				{
 					// This is special behavior that allows Miasma enemies to

@@ -72,6 +72,8 @@ class HallState extends FlxState
 		hud = new HUD();
 		add(hud);
 
+		enemies.forEach(hud.addNewEnemyHealthBar);
+
 		// combatHud = new CombatHUD();
 		// add(combatHud);
 
@@ -123,16 +125,8 @@ class HallState extends FlxState
 		{
 			case "player":
 				player.setPosition(x, y);
-			case "sword":
-				items.add(new Item(x, y, SWORD));
-			case "bow":
-				items.add(new Item(x, y, BOW));
-			case "castle":
-				true; // Deal with the castle
 			case "miasma":
 				enemies.add(new Miasma(x, y));
-			default: // Assume everything else is an enemy
-				enemies.add(new Enemy(x, y, entity.name));
 		}
 	}
 
@@ -160,7 +154,7 @@ class HallState extends FlxState
 			if (player.activeDamageAura())
 			{
 				enemy.onBeingInjured(player.getMidpoint());
-				hud.updateEnemyHealth(enemy, Std.int(enemy.health), enemy.enemyMaxHealth);
+				hud.updateEnemyHealthBar(enemy, Std.int(enemy.health), enemy.enemyMaxHealth);
 				if (enemy.health == 0)
 					enemy.kill();
 			}
@@ -181,8 +175,8 @@ class HallState extends FlxState
 		if (overworld.ray(enemy.getMidpoint(), player.getMidpoint()))
 		{
 			enemy.seesPlayer = true;
-			enemy.playerPosition = player.getMidpoint();
-			enemy.state = SWARMING;
+			enemy.isAggressive = true;
+			enemy.onSeeingEnemyEntity(player.getMidpoint());
 		}
 		else
 		{
