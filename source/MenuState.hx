@@ -1,8 +1,8 @@
 package;
 
 import flixel.FlxG;
+import flixel.FlxSprite;
 import flixel.FlxState;
-import flixel.text.FlxText;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
 
@@ -10,7 +10,7 @@ class MenuState extends FlxState
 {
 	var playButton:FlxButton;
 	var testButton:FlxButton;
-	var titleText:FlxText;
+	var titleCard:FlxSprite;
 
 	override public function create()
 	{
@@ -18,10 +18,9 @@ class MenuState extends FlxState
 
 		super.create();
 
-		titleText = new FlxText(20, 0, 0, "MiniQuest", 22);
-		titleText.alignment = CENTER;
-		titleText.screenCenter(X);
-		add(titleText);
+		titleCard = new FlxSprite(0, 0);
+		titleCard.loadGraphic(AssetPaths.Title_mini__png);
+		add(titleCard);
 
 		playButton = new FlxButton(0, 0, "Play", clickPlay);
 		playButton.x = (FlxG.width / 2) - playButton.width - 10;
