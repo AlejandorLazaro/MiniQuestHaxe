@@ -33,6 +33,8 @@ class Miasma extends Enemy
 
 	override public function update(elapsed:Float)
 	{
+		// if (!isActive)
+		// 	return;
 		if (this.isFlickering())
 			return;
 		else if (state == SWARMING)

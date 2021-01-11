@@ -105,6 +105,7 @@ class HallState extends FlxState
 			FlxG.collide(player, overworld);
 			FlxG.collide(enemies, overworld);
 			FlxG.collide(enemies, enemies);
+			enemies.forEachAlive(shouldBeActive);
 			enemies.forEachAlive(checkEnemyVision);
 			FlxG.overlap(player, enemies, playerTouchEnemy);
 			if (player.health == 0)
@@ -169,6 +170,11 @@ class HallState extends FlxState
 	}
 
 	// Functions determining enemy characteristics (such as seeing the player)
+
+	function shouldBeActive(enemy:Enemy)
+	{
+		enemy.isActive = !(enemy.getMidpoint().distanceTo(player.getMidpoint()) > enemy.ACTIVE_RANGE);
+	}
 
 	function checkEnemyVision(enemy:Enemy)
 	{

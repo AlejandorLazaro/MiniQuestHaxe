@@ -18,7 +18,6 @@ using flixel.util.FlxSpriteUtil;
 class SingleEnemyState extends FlxState
 {
 	var player:Player;
-	var castle:Castle;
 	var enemies:FlxTypedGroup<Enemy>;
 
 	var map:FlxOgmo3Loader;
@@ -108,10 +107,10 @@ class SingleEnemyState extends FlxState
 		else
 		{
 			FlxG.overlap(player, items, playerTouchItem);
-			FlxG.overlap(player, castle, playerTouchCastle);
 			FlxG.collide(player, overworld);
 			FlxG.collide(enemies, overworld);
 			FlxG.collide(enemies, enemies);
+			enemies.forEachAlive(shouldBeActive);
 			enemies.forEachAlive(checkEnemyVision);
 			FlxG.overlap(player, enemies, playerTouchEnemy);
 			if (player.health == 0)
@@ -136,8 +135,6 @@ class SingleEnemyState extends FlxState
 				items.add(new Item(x, y, SWORD));
 			case "bow":
 				items.add(new Item(x, y, BOW));
-			case "castle":
-				castle.setPosition(x, y);
 			case "miasma":
 				enemies.add(new Miasma(x, y));
 			case "crab":
@@ -160,18 +157,6 @@ class SingleEnemyState extends FlxState
 			player.unlockItem(item.type);
 			hud.unlockItem(item.type);
 			item.kill();
-		}
-	}
-
-	function playerTouchCastle(player:Player, castle:Castle)
-	{
-		if (player.alive && player.exists && castle.alive && castle.exists)
-		{
-			FlxG.camera.fade(FlxColor.BLACK, 0.33, false, function()
-			{
-				FlxG.switchState(new CastleState());
-			});
-			player.health = 0; // Placeholder logic that kills the player until we have something meaningful happening with the castle, like loading a new level/area
 		}
 	}
 
@@ -209,6 +194,11 @@ class SingleEnemyState extends FlxState
 	}
 
 	// Functions determining enemy characteristics (such as seeing the player)
+
+	function shouldBeActive(enemy:Enemy)
+	{
+		enemy.isActive = !(enemy.getMidpoint().distanceTo(player.getMidpoint()) > enemy.ACTIVE_RANGE);
+	}
 
 	function checkEnemyVision(enemy:Enemy)
 	{

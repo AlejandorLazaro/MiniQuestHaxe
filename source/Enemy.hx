@@ -20,12 +20,17 @@ class Enemy extends FlxSprite
 {
 	static inline var SPEED:Float = 80;
 
+	// Calculated based on the game dimensions in the Main.hx FlxGame params.
+	// Be sure it's roughly the following: sqrt((2x/3)^2+(2y/3)^2);x=width,y=height
+	public var ACTIVE_RANGE:Float = 175;
+
 	var name:String;
 
 	var idleTimer:Float;
 	var moveDirection:Float;
 
 	public var enemyMaxHealth:Int;
+	public var isActive:Bool = false;
 	public var isAggressive:Bool = false;
 	public var state:EnemyState;
 	public var seesPlayer:Bool;
@@ -51,6 +56,8 @@ class Enemy extends FlxSprite
 	{
 		if (name != "preconfigured") // Only set values when another inherited class didn't already do it
 		{
+			if (!isActive)
+				return;
 			if (this.isFlickering())
 				return;
 			animation.play("idle");

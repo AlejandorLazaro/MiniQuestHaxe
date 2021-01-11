@@ -37,6 +37,10 @@ class SandCreep extends Enemy
 
 	override public function update(elapsed:Float)
 	{
+		if (!isActive)
+			return;
+		if (this.isFlickering())
+			return;
 		if (state == SWARMING)
 		{
 			// Chase after the player until line of sight is lost

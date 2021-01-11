@@ -98,6 +98,7 @@ class CastleState extends FlxState
 			FlxG.collide(player, npcs);
 			FlxG.collide(npcs, npcs);
 			FlxG.collide(enemies, enemies);
+			enemies.forEachAlive(shouldBeActive);
 			enemies.forEachAlive(checkEnemyVision);
 			if (player.health == 0)
 			{
@@ -129,6 +130,11 @@ class CastleState extends FlxState
 	}
 
 	// Functions determining enemy characteristics (such as seeing the player)
+
+	function shouldBeActive(enemy:Enemy)
+	{
+		enemy.isActive = !(enemy.getMidpoint().distanceTo(player.getMidpoint()) > enemy.ACTIVE_RANGE);
+	}
 
 	function checkEnemyVision(enemy:Enemy)
 	{
