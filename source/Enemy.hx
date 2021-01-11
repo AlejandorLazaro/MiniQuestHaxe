@@ -6,6 +6,7 @@ import flixel.FlxSprite;
 import flixel.math.FlxPoint;
 import flixel.math.FlxVelocity;
 import flixel.system.FlxSound;
+import flixel.ui.FlxBar;
 
 using flixel.util.FlxSpriteUtil;
 
@@ -26,6 +27,7 @@ class Enemy extends FlxSprite
 	var moveDirection:Float;
 
 	public var enemyMaxHealth:Int;
+	// public var enemyHealthBar:FlxBar;
 	public var isAggressive:Bool = false;
 	public var state:EnemyState;
 	public var seesPlayer:Bool;
@@ -44,6 +46,12 @@ class Enemy extends FlxSprite
 
 			idleTimer = 0;
 			playerPosition = FlxPoint.get();
+
+			// enemyHealthBar = new FlxBar(x, y, LEFT_TO_RIGHT, 12, 2, this);
+			// create and add a FlxBar to show the enemySprite's health. We'll make it Red and Yellow.
+			// enemyHealthBar = new FlxBar(enemySprite.x - 6, playerHealthCounter.y, LEFT_TO_RIGHT, 20, 10);
+			// enemyHealthBar.value = 100; // the enemySprite's health bar starts at 100%
+			// enemyHealthBar.createFilledBar(FlxColor.BLACK, FlxColor.RED, true, FlxColor.WHITE);
 		}
 	}
 
@@ -62,6 +70,7 @@ class Enemy extends FlxSprite
 	{
 		this.flicker();
 		health--;
+		// enemyHealthBar.value = (health / enemyMaxHealth) * 100; // change the enemy's health bar
 	}
 
 	public function onEnemyContact(point:FlxPoint)

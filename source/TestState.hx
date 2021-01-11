@@ -186,7 +186,7 @@ class TestState extends FlxState
 			if (player.activeDamageAura())
 			{
 				enemy.onBeingInjured(player.getMidpoint());
-				hud.updateEnemyHealth(enemy, Std.int(enemy.health), enemy.enemyMaxHealth);
+				hud.updateEnemyHealthBar(enemy, Std.int(enemy.health), enemy.enemyMaxHealth);
 				if (enemy.health == 0)
 				{
 					// This is special behavior that allows Miasma enemies to
