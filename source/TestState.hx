@@ -18,8 +18,7 @@ using flixel.util.FlxSpriteUtil;
 
 class TestState extends FlxState
 {
-	// public static var arrows:FlxTypedGroup<Arrow>;
-	public static var arrows:FlxTypedGroup<FlxSprite>;
+	public static var arrows:FlxTypedGroup<Arrow>;
 
 	var player:Player;
 	var castle:Castle;
@@ -78,23 +77,12 @@ class TestState extends FlxState
 		add(player);
 
 		var poolSize:Int = 10;
-		// var arrow:Arrow;
-		var sprite:FlxSprite;
-		arrows = new FlxTypedGroup<FlxSprite>(poolSize);
+		var arrow:Arrow;
+		arrows = new FlxTypedGroup<Arrow>(poolSize);
 		for (i in 0...poolSize)
 		{
-			// arrow = new Arrow();
-
-			sprite = new FlxSprite(-100, -100);
-			sprite.makeGraphic(8, 2);
-			sprite.width = 2;
-			sprite.height = 2;
-			sprite.offset.set(3, 0);
-			sprite.exists = false;
-
-			// arrows.add(arrow);
-
-			arrows.add(sprite);
+			arrow = new Arrow();
+			arrows.add(arrow);
 		}
 		add(arrows);
 
