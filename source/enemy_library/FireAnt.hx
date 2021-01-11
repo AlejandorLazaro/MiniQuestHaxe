@@ -11,6 +11,7 @@ class FireAnt extends Enemy
 	static inline var SPEED:Float = 80;
 
 	var swarmTimer:Float;
+	var isRunning:Bool;
 
 	override public function new(x:Float, y:Float)
 	{
@@ -40,6 +41,11 @@ class FireAnt extends Enemy
 			animation.play("idle"); // Update this later when there's a unique animation for it
 			swarmingBehavior(elapsed);
 		}
+		else if (state == RUNNING)
+		{
+			animation.play("idle");
+			runningBehavior(elapsed);
+		}
 		else
 		{
 			animation.play("idle");
@@ -56,13 +62,24 @@ class FireAnt extends Enemy
 			state = SWARMING;
 			playerPosition = point;
 		}
+		else if (isRunning)
+		{
+			state = RUNNING;
+			playerPosition = point;
+		}
 	}
 
 	override public function onBeingInjured(point:FlxPoint)
 	{
 		this.flicker();
 		health--;
-		isAggressive = true;
+		if (health <= 2)
+		{
+			isAggressive = false;
+			isRunning = true;
+		}
+		else
+			isAggressive = true;
 	}
 
 	function idleBehavior(elapsed:Float)
@@ -100,6 +117,20 @@ class FireAnt extends Enemy
 				state = IDLE;
 			}
 			swarmTimer -= elapsed;
+		}
+		else
+		{
+			state = IDLE;
+		}
+	}
+
+	function runningBehavior(elapsed:Float)
+	{
+		if (this.getPosition().distanceTo(playerPosition) < 20)
+		{
+			// var runningAngle = -this.getPosition().angleBetween(playerPosition);
+			FlxVelocity.moveTowardsPoint(this, playerPosition, Std.int(SPEED * .5));
+			velocity.rotate(FlxPoint.weak(0, 0), -this.getPosition().angleBetween(playerPosition));
 		}
 		else
 		{

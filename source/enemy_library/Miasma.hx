@@ -26,7 +26,6 @@ class Miasma extends Enemy
 		health = enemyMaxHealth;
 
 		state = IDLE; // Initially this enemy starts off idle
-		everBeenEnraged = false;
 		idleTimer = 0;
 		swarmTimer = 0;
 		playerPosition = FlxPoint.get();
@@ -52,7 +51,7 @@ class Miasma extends Enemy
 
 	override public function onSeeingEnemyEntity(point:FlxPoint)
 	{
-		if (everBeenEnraged)
+		if (isAggressive)
 		{
 			swarmTimer = FlxG.random.int(2, 4);
 			state = SWARMING;
@@ -62,7 +61,7 @@ class Miasma extends Enemy
 
 	override public function onSeingAllyKilled(point:FlxPoint)
 	{
-		everBeenEnraged = true;
+		isAggressive = true;
 		swarmTimer = FlxG.random.int(5, 8);
 		state = SWARMING;
 		playerPosition = point;
