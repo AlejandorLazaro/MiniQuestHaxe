@@ -29,6 +29,8 @@ class Player extends FlxSprite
 	var equippedWeapon:WeaponType;
 	var unlockedItems:Map<ItemType, Bool>; // We need something to represent unlocking items via pickups
 
+	public var maxHealth:Int;
+
 	var state:PlayerState;
 	var attackTimer:Float;
 	var attackDelayTimer:Float;
@@ -39,7 +41,8 @@ class Player extends FlxSprite
 	public function new(x:Float = 0, y:Float = 0)
 	{
 		super(x, y);
-		this.health = 3; // Initial health is 3
+		this.maxHealth = 3; // Initial max health is 3
+		this.health = maxHealth;
 		this.equippedWeapon = WeaponType.NONE;
 		this.unlockedItems = [];
 		loadGraphic(AssetPaths.Sprites2__png, true, 10, 10);
