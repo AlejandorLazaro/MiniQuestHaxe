@@ -35,6 +35,10 @@ class Player extends FlxSprite
 	var attackTimer:Float;
 	var attackDelayTimer:Float;
 
+	private var aimingAngle:Float;
+	private var aimingInPlace:Bool = false;
+	private var strafingActive:Bool = false;
+
 	// var stepSound:FlxSound;
 	static inline var SPEED:Float = 100;
 
@@ -58,6 +62,9 @@ class Player extends FlxSprite
 		offset.set(2, 3);
 		state = IDLE;
 		// stepSound = FlxG.sound.load(AssetPaths.step__wav);
+
+		FlxG.watch.add(this, "aimingInPlace");
+		FlxG.watch.add(this, "strafingActive");
 	}
 
 	override function update(elapsed:Float)
@@ -66,6 +73,7 @@ class Player extends FlxSprite
 		updateMovement();
 		updatePlayerAnimation();
 		super.update(elapsed);
+		FlxG.watch.add(this, "aimingInPlace");
 	}
 
 	function updateMovement()
@@ -127,8 +135,18 @@ class Player extends FlxSprite
 			}
 
 			// Determine the player's velocity based on angle and speed (deals with hypotenuse travel correctly)
-			velocity.set(SPEED, 0);
-			velocity.rotate(FlxPoint.weak(0, 0), newAngle);
+			if (!aimingInPlace)
+			{
+				// Player should be slower if they are strafing while firing arrows
+				if (strafingActive && (state == ATTACKING || state == ATTACK_COOLDOWN))
+					velocity.set(SPEED * .5, 0);
+				else
+					velocity.set(SPEED, 0);
+				velocity.rotate(FlxPoint.weak(0, 0), newAngle);
+			}
+
+			if (!strafingActive)
+				aimingAngle = newAngle;
 		}
 	}
 
@@ -202,11 +220,21 @@ class Player extends FlxSprite
 	function updateState(elapsed:Float)
 	{
 		var use:Bool = false;
+		var keepAngle:Bool = false;
 
 		#if FLX_KEYBOARD
 		use = FlxG.keys.anyPressed([SPACE]);
+		keepAngle = FlxG.keys.anyPressed([SHIFT]);
 		#end
 
+		// Determine if the player will strafe or stand in place to aim his bow
+		if (keepAngle)
+			strafingActive = true;
+		else
+			strafingActive = false;
+
+		if (!use || keepAngle)
+			aimingInPlace = false;
 		if (use && state == IDLE)
 		{
 			// Add a switch statement here to make attack timer change behavior based on equipped weapon
@@ -220,15 +248,9 @@ class Player extends FlxSprite
 				case BOW:
 					attackTimer = 0.1;
 					// Add projectile logic
-					var arrow:FlxSprite = TestState.arrows.recycle();
-					arrow.reset(x + (width - arrow.width) / 2, y + (height - arrow.height) / 2);
-					arrow.angle = angle;
-
-					arrow.velocity.set(150, 0);
-					arrow.velocity.rotate(FlxPoint.weak(0, 0), arrow.angle);
-
-					arrow.velocity.x *= 2;
-					arrow.velocity.y *= 2;
+					if (!keepAngle)
+						aimingInPlace = true;
+					fireArrow();
 			}
 		}
 		else if (state == ATTACKING)
@@ -246,6 +268,8 @@ class Player extends FlxSprite
 						attackDelayTimer = 0.3;
 					case BOW:
 						attackDelayTimer = 0.8;
+						if (!use)
+							aimingInPlace = false;
 				}
 			}
 		}
@@ -257,6 +281,20 @@ class Player extends FlxSprite
 				state = IDLE;
 			}
 		}
+	}
+
+	private function fireArrow()
+	{
+		var arrow:FlxSprite = TestState.arrows.recycle();
+		arrow.reset(x + (width - arrow.width) / 2, y + (height - arrow.height) / 2);
+		// TODO: Stop in place and aim in 8 cardinal directions
+		arrow.angle = aimingAngle; // If we modify 'angle' then the actual sprite will be rotating
+
+		arrow.velocity.set(150, 0);
+		arrow.velocity.rotate(FlxPoint.weak(0, 0), arrow.angle);
+
+		arrow.velocity.x *= 2;
+		arrow.velocity.y *= 2;
 	}
 
 	// We'll need to add logic to handle switching weapons after unlocking them
