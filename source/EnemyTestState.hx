@@ -164,23 +164,21 @@ class EnemyTestState extends FlxState
 			// since it'd be nice to have different damage values (upgrades, etc)
 			if (player.activeDamageAura())
 			{
-				enemy.health--;
+				enemy.onBeingInjured(player.getMidpoint());
+				hud.updateEnemyHealth(enemy, Std.int(enemy.health), enemy.enemyMaxHealth);
 				if (enemy.health == 0)
 				{
 					// This is special behavior that allows Miasma enemies to
 					// swarm if they see the player kill another Miasma entity
 					if (Type.getClass(enemy) == Miasma)
-					{
 						enemies.forEachOfType(Miasma, checkSeenEnemyKilled);
-					}
 					enemy.kill();
 				}
-				enemy.onBeingInjured(player.getMidpoint());
 			}
 			else
 			{
 				player.health--;
-				hud.updateHealth(Std.int(player.health));
+				hud.updatePlayerHealth(Std.int(player.health), Std.int(player.maxHealth));
 				player.flicker();
 			}
 		}
