@@ -38,9 +38,14 @@ class Player extends FlxSprite
 	private var aimingAngle:Float;
 	private var aimingInPlace:Bool = false;
 	private var strafingActive:Bool = false;
+	private var aimingArrow:FlxSprite;
+	private var aimingArrowDelayTimer:Float;
 
 	// var stepSound:FlxSound;
 	static inline var SPEED:Float = 100;
+
+	var x_diff:Float = 20;
+	var y_diff:Float = 20;
 
 	public function new(x:Float = 0, y:Float = 0)
 	{
@@ -62,6 +67,16 @@ class Player extends FlxSprite
 		offset.set(2, 3);
 		state = IDLE;
 		// stepSound = FlxG.sound.load(AssetPaths.step__wav);
+
+		// Set the graphic to show where the bow is currently aiming
+		aimingArrow = new FlxSprite(x, y);
+		aimingArrow.offset.set(12, 22);
+		aimingArrow.loadGraphic(AssetPaths.aim_arrow__png, false, 4, 6);
+		aimingArrow.visible = false;
+		aimingArrowDelayTimer = 0.2;
+
+		// FlxG.watch.add(this, 'x_diff');
+		// FlxG.watch.add(this, 'y_diff');
 	}
 
 	override function update(elapsed:Float)
@@ -70,6 +85,7 @@ class Player extends FlxSprite
 		updateMovement();
 		updatePlayerAnimation();
 		super.update(elapsed);
+		aimingArrow.setPosition(x + x_diff, y + y_diff);
 	}
 
 	function updateMovement()
@@ -142,7 +158,10 @@ class Player extends FlxSprite
 			}
 
 			if (!strafingActive)
+			{
 				aimingAngle = newAngle;
+				aimingArrow.angle = newAngle;
+			}
 		}
 	}
 
@@ -277,6 +296,19 @@ class Player extends FlxSprite
 				state = IDLE;
 			}
 		}
+
+		if (aimingInPlace || strafingActive)
+		{
+			if (aimingArrowDelayTimer < 0)
+				aimingArrow.visible = true;
+			else
+				aimingArrowDelayTimer -= elapsed;
+		}
+		else
+		{
+			aimingArrow.visible = false;
+			aimingArrowDelayTimer = 0.2;
+		}
 	}
 
 	private function fireArrow()
@@ -319,5 +351,13 @@ class Player extends FlxSprite
 	public function activeDamageAura():Bool
 	{
 		return attackTimer > 0;
+	}
+
+	// Return an array of all FlxSprites that should animate/relate to the player
+	//
+	// E.g.: Aiming arrows, animating buffs/effects, etc
+	public function enumerateDrawEffects():Array<FlxSprite>
+	{
+		return [aimingArrow];
 	}
 }
