@@ -67,9 +67,7 @@ class Player extends FlxSprite
 
 		// Set the graphic to show where the bow is currently aiming
 		aimingArrow = new FlxSprite(x, y);
-		aimingArrow.offset.set(12, 22);
 		aimingArrow.loadGraphic(AssetPaths.aim_arrow__png, false, 4, 6);
-		aimingArrow.visible = false;
 	}
 
 	override function update(elapsed:Float)
@@ -78,7 +76,7 @@ class Player extends FlxSprite
 		updateMovement();
 		updatePlayerAnimation();
 		super.update(elapsed);
-		aimingArrow.setPosition(x + 20, y + 20);
+		aimingArrow.setPosition(x + 1, y);
 	}
 
 	function updateMovement()
@@ -154,6 +152,8 @@ class Player extends FlxSprite
 			{
 				aimingAngle = newAngle;
 				aimingArrow.angle = newAngle;
+				aimingArrow.offset.set(-8, 0);
+				aimingArrow.offset.rotate(FlxPoint.weak(0, 0), newAngle);
 			}
 		}
 	}
