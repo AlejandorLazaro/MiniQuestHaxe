@@ -16,7 +16,7 @@ class Arrow extends FlxSprite
 	public function new(x:Float = 0, y:Float = 0)
 	{
 		super(x, y);
-		this.makeGraphic(8, 2);
+		loadGraphic(AssetPaths.arrow__png, false, 8, 2);
 		width = 2;
 		height = 2;
 		offset.set(3, 0);
