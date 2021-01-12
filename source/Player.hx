@@ -281,7 +281,8 @@ class Player extends FlxSprite
 
 	private function fireArrow()
 	{
-		var arrow:FlxSprite = TestState.arrows.recycle();
+		var arrow:Arrow = TestState.arrows.recycle();
+		arrow.startArrow();
 		arrow.reset(x + (width - arrow.width) / 2, y + (height - arrow.height) / 2);
 		// TODO: Stop in place and aim in 8 cardinal directions
 		arrow.angle = aimingAngle; // If we modify 'angle' then the actual sprite will be rotating
