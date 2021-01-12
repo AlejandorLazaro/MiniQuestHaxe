@@ -51,7 +51,7 @@ class TestState extends FlxState
 		overworld.setTileProperties(13, FlxObject.NONE); // Bleached Road
 		overworld.setTileProperties(14, FlxObject.NONE); // Wooden Board
 		overworld.setTileProperties(15, FlxObject.ANY); // Shell
-		overworld.setTileProperties(16, FlxObject.ANY); // Tree
+		overworld.setTileProperties(16, FlxObject.ANY, onContactWithTree); // Tree
 		overworld.setTileProperties(17, FlxObject.ANY); // Sky
 		overworld.setTileProperties(18, FlxObject.ANY); // Cloud
 		overworld.setTileProperties(19, FlxObject.NONE); // Dark Grass
@@ -274,6 +274,17 @@ class TestState extends FlxState
 		if (enemy.seesPlayer == true)
 		{
 			enemy.onSeingAllyKilled(player.getMidpoint());
+		}
+	}
+
+	// Functions for tile collision callbacks
+
+	function onContactWithTree(tile:FlxObject, object:FlxObject)
+	{
+		switch (Type.getClass(object))
+		{
+			case Arrow:
+				object.velocity.set(0, 0);
 		}
 	}
 
