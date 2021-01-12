@@ -75,6 +75,8 @@ class TestState extends FlxState
 		map.loadEntities(placeEntities, "entities");
 		add(castle);
 		add(player);
+		for (effect in player.enumerateDrawEffects())
+			add(effect);
 
 		var poolSize:Int = 10;
 		var arrow:Arrow;
