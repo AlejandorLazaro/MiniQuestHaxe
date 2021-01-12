@@ -44,9 +44,6 @@ class Player extends FlxSprite
 	// var stepSound:FlxSound;
 	static inline var SPEED:Float = 100;
 
-	var x_diff:Float = 20;
-	var y_diff:Float = 20;
-
 	public function new(x:Float = 0, y:Float = 0)
 	{
 		super(x, y);
@@ -73,10 +70,6 @@ class Player extends FlxSprite
 		aimingArrow.offset.set(12, 22);
 		aimingArrow.loadGraphic(AssetPaths.aim_arrow__png, false, 4, 6);
 		aimingArrow.visible = false;
-		aimingArrowDelayTimer = 0.2;
-
-		// FlxG.watch.add(this, 'x_diff');
-		// FlxG.watch.add(this, 'y_diff');
 	}
 
 	override function update(elapsed:Float)
@@ -85,7 +78,7 @@ class Player extends FlxSprite
 		updateMovement();
 		updatePlayerAnimation();
 		super.update(elapsed);
-		aimingArrow.setPosition(x + x_diff, y + y_diff);
+		aimingArrow.setPosition(x + 20, y + 20);
 	}
 
 	function updateMovement()
@@ -297,7 +290,9 @@ class Player extends FlxSprite
 			}
 		}
 
-		if (aimingInPlace || strafingActive)
+		if (strafingActive)
+			aimingArrow.visible = true;
+		else if (aimingInPlace)
 		{
 			if (aimingArrowDelayTimer < 0)
 				aimingArrow.visible = true;
@@ -307,7 +302,7 @@ class Player extends FlxSprite
 		else
 		{
 			aimingArrow.visible = false;
-			aimingArrowDelayTimer = 0.2;
+			aimingArrowDelayTimer = 0.15;
 		}
 	}
 
