@@ -10,6 +10,7 @@ import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.addons.editors.ogmo.FlxOgmo3Loader;
 import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.tile.FlxTile;
 import flixel.tile.FlxTilemap;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
@@ -38,13 +39,13 @@ class TestState extends FlxState
 		overworld.follow();
 		overworld.setTileProperties(1, FlxObject.NONE); // Grass
 		overworld.setTileProperties(2, FlxObject.ANY); // Ice Block
-		overworld.setTileProperties(3, FlxObject.ANY); // Boulder
+		overworld.setTileProperties(3, FlxObject.ANY, onContactWithRock); // Boulder
 		overworld.setTileProperties(4, FlxObject.NONE); // Beach Sand
 		overworld.setTileProperties(5, FlxObject.NONE); // Craggy Ground
 		overworld.setTileProperties(6, FlxObject.NONE); // Desert Sand
 		overworld.setTileProperties(7, FlxObject.NONE); // Dirt
-		overworld.setTileProperties(8, FlxObject.ANY); // Water
-		overworld.setTileProperties(9, FlxObject.ANY); // Brown Boulder
+		overworld.setTileProperties(8, FlxObject.ANY, onContactWithWater); // Water
+		overworld.setTileProperties(9, FlxObject.ANY, onContactWithRock); // Brown Boulder
 		overworld.setTileProperties(10, FlxObject.NONE); // Upheaved Desert Sand
 		overworld.setTileProperties(11, FlxObject.NONE); // Flowers
 		overworld.setTileProperties(12, FlxObject.NONE); // Metal Floor
@@ -52,12 +53,12 @@ class TestState extends FlxState
 		overworld.setTileProperties(14, FlxObject.NONE); // Wooden Board
 		overworld.setTileProperties(15, FlxObject.ANY); // Shell
 		overworld.setTileProperties(16, FlxObject.ANY, onContactWithTree); // Tree
-		overworld.setTileProperties(17, FlxObject.ANY); // Sky
-		overworld.setTileProperties(18, FlxObject.ANY); // Cloud
+		overworld.setTileProperties(17, FlxObject.ANY, onContactWithSky); // Sky
+		overworld.setTileProperties(18, FlxObject.ANY, onContactWithSky); // Cloud
 		overworld.setTileProperties(19, FlxObject.NONE); // Dark Grass
-		overworld.setTileProperties(20, FlxObject.ANY); // Dark Tree
+		overworld.setTileProperties(20, FlxObject.ANY, onContactWithTree); // Dark Tree
 		overworld.setTileProperties(21, FlxObject.NONE); // Golden Road
-		overworld.setTileProperties(22, FlxObject.ANY); // Fruit Tree
+		overworld.setTileProperties(22, FlxObject.ANY, onContactWithTree); // Fruit Tree
 		add(overworld);
 
 		// coins = new FlxTypedGroup<Coin>();
@@ -128,7 +129,7 @@ class TestState extends FlxState
 			FlxG.collide(player, overworld);
 			FlxG.collide(enemies, overworld);
 			FlxG.collide(enemies, enemies);
-			FlxG.collide(arrows, overworld);
+			FlxG.overlap(arrows, overworld, arrowOverlapWithTileNotifyCallback, arrowOverlapWithTileProcessCallback);
 			FlxG.overlap(arrows, enemies, arrowTouchEnemy);
 			enemies.forEachAlive(shouldBeActive);
 			enemies.forEachAlive(checkEnemyVision);
@@ -277,6 +278,17 @@ class TestState extends FlxState
 		}
 	}
 
+	// Functions specifically for arrow collision callbacks
+
+	function arrowOverlapWithTileNotifyCallback(Arrow:Arrow, Tile:FlxTile):Void {}
+
+	function arrowOverlapWithTileProcessCallback(Arrow:Arrow, Tile:FlxTile):Bool
+	{
+		// if (!arrowPermeableTiles.contains(Tile.index))
+		FlxObject.separate(Arrow, Tile);
+		return true;
+	}
+
 	// Functions for tile collision callbacks
 
 	function onContactWithTree(tile:FlxObject, object:FlxObject)
@@ -285,6 +297,34 @@ class TestState extends FlxState
 		{
 			case Arrow:
 				object.velocity.set(0, 0);
+		}
+	}
+
+	function onContactWithRock(tile:FlxObject, object:FlxObject)
+	{
+		switch (Type.getClass(object))
+		{
+			case Arrow:
+				object.velocity.set(0, 0);
+				object.flicker(0.8, 0.1, function(Void) object.kill());
+		}
+	}
+
+	function onContactWithWater(tile:FlxObject, object:FlxObject)
+	{
+		switch (Type.getClass(object))
+		{
+			case Arrow:
+				return;
+		}
+	}
+
+	function onContactWithSky(tile:FlxObject, object:FlxObject)
+	{
+		switch (Type.getClass(object))
+		{
+			case Arrow:
+				return;
 		}
 	}
 
