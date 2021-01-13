@@ -35,31 +35,34 @@ class TestState extends FlxState
 
 	override public function create()
 	{
-		map = new FlxOgmo3Loader(AssetPaths.miniQuest__ogmo, AssetPaths.test__json);
-		overworld = map.loadTilemap(AssetPaths.TileTextures2__png, "overworld");
-		overworld.follow();
-		overworld.setTileProperties(1, FlxObject.NONE); // Grass
-		overworld.setTileProperties(2, FlxObject.ANY, onContactWithIceBlock); // Ice Block
-		overworld.setTileProperties(3, FlxObject.ANY, onContactWithRock); // Boulder
-		overworld.setTileProperties(4, FlxObject.NONE); // Beach Sand
-		overworld.setTileProperties(5, FlxObject.NONE); // Craggy Ground
-		overworld.setTileProperties(6, FlxObject.NONE); // Desert Sand
-		overworld.setTileProperties(7, FlxObject.NONE); // Dirt
-		overworld.setTileProperties(8, FlxObject.ANY, onContactWithWater); // Water
-		overworld.setTileProperties(9, FlxObject.ANY, onContactWithRock); // Brown Boulder
-		overworld.setTileProperties(10, FlxObject.NONE); // Upheaved Desert Sand
-		overworld.setTileProperties(11, FlxObject.NONE); // Flowers
-		overworld.setTileProperties(12, FlxObject.NONE); // Metal Floor
-		overworld.setTileProperties(13, FlxObject.NONE); // Bleached Road
-		overworld.setTileProperties(14, FlxObject.NONE); // Wooden Board
-		overworld.setTileProperties(15, FlxObject.ANY, onContactWithShell); // Shell
-		overworld.setTileProperties(16, FlxObject.ANY, onContactWithTree); // Tree
-		overworld.setTileProperties(17, FlxObject.ANY, onContactWithSky); // Sky
-		overworld.setTileProperties(18, FlxObject.ANY, onContactWithSky); // Cloud
-		overworld.setTileProperties(19, FlxObject.NONE); // Dark Grass
-		overworld.setTileProperties(20, FlxObject.ANY, onContactWithTree); // Dark Tree
-		overworld.setTileProperties(21, FlxObject.NONE); // Golden Road
-		overworld.setTileProperties(22, FlxObject.ANY, onContactWithTree); // Fruit Tree
+		map = loadTileMapFromOgmoMap(AssetPaths.miniQuest__ogmo, AssetPaths.test__json);
+		overworld = loadTileMapFromOgmoMap();
+
+		// map = new FlxOgmo3Loader(AssetPaths.miniQuest__ogmo, AssetPaths.test__json);
+		// overworld = map.loadTilemap(AssetPaths.TileTextures2__png, "overworld");
+		// overworld.follow();
+		// overworld.setTileProperties(1, FlxObject.NONE); // Grass
+		// overworld.setTileProperties(2, FlxObject.ANY, onContactWithIceBlock); // Ice Block
+		// overworld.setTileProperties(3, FlxObject.ANY, onContactWithRock); // Boulder
+		// overworld.setTileProperties(4, FlxObject.NONE); // Beach Sand
+		// overworld.setTileProperties(5, FlxObject.NONE); // Craggy Ground
+		// overworld.setTileProperties(6, FlxObject.NONE); // Desert Sand
+		// overworld.setTileProperties(7, FlxObject.NONE); // Dirt
+		// overworld.setTileProperties(8, FlxObject.ANY, onContactWithWater); // Water
+		// overworld.setTileProperties(9, FlxObject.ANY, onContactWithRock); // Brown Boulder
+		// overworld.setTileProperties(10, FlxObject.NONE); // Upheaved Desert Sand
+		// overworld.setTileProperties(11, FlxObject.NONE); // Flowers
+		// overworld.setTileProperties(12, FlxObject.NONE); // Metal Floor
+		// overworld.setTileProperties(13, FlxObject.NONE); // Bleached Road
+		// overworld.setTileProperties(14, FlxObject.NONE); // Wooden Board
+		// overworld.setTileProperties(15, FlxObject.ANY, onContactWithShell); // Shell
+		// overworld.setTileProperties(16, FlxObject.ANY, onContactWithTree); // Tree
+		// overworld.setTileProperties(17, FlxObject.ANY, onContactWithSky); // Sky
+		// overworld.setTileProperties(18, FlxObject.ANY, onContactWithSky); // Cloud
+		// overworld.setTileProperties(19, FlxObject.NONE); // Dark Grass
+		// overworld.setTileProperties(20, FlxObject.ANY, onContactWithTree); // Dark Tree
+		// overworld.setTileProperties(21, FlxObject.NONE); // Golden Road
+		// overworld.setTileProperties(22, FlxObject.ANY, onContactWithTree); // Fruit Tree
 		add(overworld);
 
 		// coins = new FlxTypedGroup<Coin>();
