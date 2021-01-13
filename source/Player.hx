@@ -310,7 +310,7 @@ class Player extends FlxSprite
 	{
 		var arrow:Arrow = TestState.arrows.recycle();
 		arrow.startArrow();
-		arrow.reset(x + (width - arrow.width) / 2, y + (height - arrow.height) / 2);
+		arrow.reset(x + (width - arrow.width) / 2, y + (offset.y - arrow.height) / 2);
 		// TODO: Stop in place and aim in 8 cardinal directions
 		arrow.angle = aimingAngle; // If we modify 'angle' then the actual sprite will be rotating
 
