@@ -10,6 +10,7 @@ import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.addons.editors.ogmo.FlxOgmo3Loader;
 import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.tile.FlxBaseTilemap;
 import flixel.tile.FlxTile;
 import flixel.tile.FlxTilemap;
 import flixel.ui.FlxButton;
@@ -38,7 +39,7 @@ class TestState extends FlxState
 		overworld = map.loadTilemap(AssetPaths.TileTextures2__png, "overworld");
 		overworld.follow();
 		overworld.setTileProperties(1, FlxObject.NONE); // Grass
-		overworld.setTileProperties(2, FlxObject.ANY); // Ice Block
+		overworld.setTileProperties(2, FlxObject.ANY, onContactWithIceBlock); // Ice Block
 		overworld.setTileProperties(3, FlxObject.ANY, onContactWithRock); // Boulder
 		overworld.setTileProperties(4, FlxObject.NONE); // Beach Sand
 		overworld.setTileProperties(5, FlxObject.NONE); // Craggy Ground
@@ -51,7 +52,7 @@ class TestState extends FlxState
 		overworld.setTileProperties(12, FlxObject.NONE); // Metal Floor
 		overworld.setTileProperties(13, FlxObject.NONE); // Bleached Road
 		overworld.setTileProperties(14, FlxObject.NONE); // Wooden Board
-		overworld.setTileProperties(15, FlxObject.ANY); // Shell
+		overworld.setTileProperties(15, FlxObject.ANY, onContactWithShell); // Shell
 		overworld.setTileProperties(16, FlxObject.ANY, onContactWithTree); // Tree
 		overworld.setTileProperties(17, FlxObject.ANY, onContactWithSky); // Sky
 		overworld.setTileProperties(18, FlxObject.ANY, onContactWithSky); // Cloud
@@ -129,7 +130,7 @@ class TestState extends FlxState
 			FlxG.collide(player, overworld);
 			FlxG.collide(enemies, overworld);
 			FlxG.collide(enemies, enemies);
-			FlxG.overlap(arrows, overworld, arrowOverlapWithTileNotifyCallback, arrowOverlapWithTileProcessCallback);
+			FlxG.overlap(arrows, overworld, null, arrowOverlapWithTileProcessCallback);
 			FlxG.overlap(arrows, enemies, arrowTouchEnemy);
 			enemies.forEachAlive(shouldBeActive);
 			enemies.forEachAlive(checkEnemyVision);
@@ -278,15 +279,11 @@ class TestState extends FlxState
 		}
 	}
 
-	// Functions specifically for arrow collision callbacks
+	// Functions specifically for arrow overlap callbacks
 
-	function arrowOverlapWithTileNotifyCallback(Arrow:Arrow, Tile:FlxTile):Void {}
-
-	function arrowOverlapWithTileProcessCallback(Arrow:Arrow, Tile:FlxTile):Bool
+	function arrowOverlapWithTileProcessCallback(Arrow:Arrow, TileMap:FlxBaseTilemap<Dynamic>):Bool
 	{
-		// if (!arrowPermeableTiles.contains(Tile.index))
-		FlxObject.separate(Arrow, Tile);
-		return true;
+		return TileMap.overlapsWithCallback(Arrow, null);
 	}
 
 	// Functions for tile collision callbacks
@@ -296,6 +293,7 @@ class TestState extends FlxState
 		switch (Type.getClass(object))
 		{
 			case Arrow:
+				FlxObject.separate(tile, object);
 				object.velocity.set(0, 0);
 		}
 	}
@@ -305,8 +303,29 @@ class TestState extends FlxState
 		switch (Type.getClass(object))
 		{
 			case Arrow:
+				FlxObject.separate(tile, object);
 				object.velocity.set(0, 0);
 				object.flicker(0.8, 0.1, function(Void) object.kill());
+		}
+	}
+
+	function onContactWithIceBlock(tile:FlxObject, object:FlxObject)
+	{
+		switch (Type.getClass(object))
+		{
+			case Arrow:
+				FlxObject.separate(tile, object);
+				object.velocity.set(0, 0);
+		}
+	}
+
+	function onContactWithShell(tile:FlxObject, object:FlxObject)
+	{
+		switch (Type.getClass(object))
+		{
+			case Arrow:
+				FlxObject.separate(tile, object);
+				object.velocity.set(0, 0);
 		}
 	}
 
