@@ -12,24 +12,24 @@ class TileHelper
 	 *
 	 * @param	OgmoAssetsPath	Specify the *.ogmo file that contains the project data to load.
 	 * @param	OgmoJSONPath	Path to the JSON file that contains the map level data to load.
-	 * @returns	Returns a FlxOgmo3Loader object that can then have a FlxTileMap created from it
+	 * @return	Returns a FlxOgmo3Loader object that can then have a FlxTileMap created from it
 	 */
-	public function loadOgmo3MapFromOgmoFile(OgmoAssetsPath:String, OgmoJSONPath:String)
+	public static function loadOgmo3MapFromOgmoFile(OgmoAssetsPath:String, OgmoJSONPath:String):FlxOgmo3Loader
 	{
 		return new FlxOgmo3Loader(AssetPaths.miniQuest__ogmo, AssetPaths.test__json);
 	}
 
 	/**
-	 * Call this function to lock the automatic camera to the map's edges.
+	 * Call this to load a tilemap from an FlxOgmo3Loader object and set camera/tile properties
 	 *
 	 * @param	OgmoMap			Specify which game camera you want.  If null getScreenPosition() will just grab the first global camera.
 	 * @param	TileTexturePath	Adjusts the camera follow boundary by whatever number of tiles you specify here.  Handy for blocking off deadends that are offscreen, etc.  Use a negative number to add padding instead of hiding the edges.
 	 * @param	TileLayerName	Whether to update the collision system's world size, default value is true.
 	 * @param	FollowCamera	Whether to update the collision system's world size, default value is true.
 	 * @param	TileToCollisionCallbackMap	Whether to update the collision system's world size, default value is true.
-	 * @returns A fully configured FlxTilemap object that has tiles configured with images and collision logic.
+	 * @return	A fully configured FlxTilemap object that has tiles configured with images and collision logic.
 	 */
-	public function loadTileMapFromOgmoMap(OgmoMap:FlxOgmo3Loader, TileTexturePath:String, TileLayerName:String, ?FollowCamera:Bool,
+	public static function loadTileMapFromOgmoMap(OgmoMap:FlxOgmo3Loader, TileTexturePath:String, TileLayerName:String, ?FollowCamera:Bool,
 			?TileToCollisionCallbackMap:Map<Int, FlxObject->Void>)
 	{
 		var overworld = OgmoMap.loadTilemap(AssetPaths.TileTextures2__png, "overworld");
@@ -44,7 +44,7 @@ class TileHelper
 		return overworld;
 	}
 
-	private function setDefaultTileCollisionProperties(TileMap:FlxTilemap)
+	private static function setDefaultTileCollisionProperties(TileMap:FlxTilemap)
 	{
 		TileMap.setTileProperties(1, FlxObject.NONE); // Grass
 		TileMap.setTileProperties(2, FlxObject.ANY, onContactWithIceBlock); // Ice Block
@@ -72,7 +72,7 @@ class TileHelper
 
 	// Default tile collision callbacks
 
-	function onContactWithTree(tile:FlxObject, object:FlxObject)
+	static function onContactWithTree(tile:FlxObject, object:FlxObject)
 	{
 		switch (Type.getClass(object))
 		{
@@ -82,7 +82,7 @@ class TileHelper
 		}
 	}
 
-	function onContactWithRock(tile:FlxObject, object:FlxObject)
+	static function onContactWithRock(tile:FlxObject, object:Dynamic)
 	{
 		switch (Type.getClass(object))
 		{
@@ -93,7 +93,7 @@ class TileHelper
 		}
 	}
 
-	function onContactWithIceBlock(tile:FlxObject, object:FlxObject)
+	static function onContactWithIceBlock(tile:FlxObject, object:FlxObject)
 	{
 		switch (Type.getClass(object))
 		{
@@ -103,7 +103,7 @@ class TileHelper
 		}
 	}
 
-	function onContactWithShell(tile:FlxObject, object:FlxObject)
+	static function onContactWithShell(tile:FlxObject, object:FlxObject)
 	{
 		switch (Type.getClass(object))
 		{
@@ -113,7 +113,7 @@ class TileHelper
 		}
 	}
 
-	function onContactWithWater(tile:FlxObject, object:FlxObject)
+	static function onContactWithWater(tile:FlxObject, object:FlxObject)
 	{
 		switch (Type.getClass(object))
 		{
@@ -122,7 +122,7 @@ class TileHelper
 		}
 	}
 
-	function onContactWithSky(tile:FlxObject, object:FlxObject)
+	static function onContactWithSky(tile:FlxObject, object:FlxObject)
 	{
 		switch (Type.getClass(object))
 		{
