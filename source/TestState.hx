@@ -11,7 +11,6 @@ import flixel.FlxState;
 import flixel.addons.editors.ogmo.FlxOgmo3Loader;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.tile.FlxBaseTilemap;
-import flixel.tile.FlxTile;
 import flixel.tile.FlxTilemap;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
@@ -97,9 +96,6 @@ class TestState extends FlxState
 
 		enemies.forEach(hud.addNewEnemyHealthBar);
 
-		// combatHud = new CombatHUD();
-		// add(combatHud);
-
 		#if mobile
 		virtualPad = new FlxVirtualPad(FULL, NONE);
 		add(virtualPad);
@@ -110,7 +106,6 @@ class TestState extends FlxState
 		endButton = new FlxButton(0, 0, "End Test", doneFadeOut);
 		endButton.x = (FlxG.width - 20) - endButton.width - 10;
 		endButton.y = FlxG.height - endButton.height - 10;
-		// endButton.onUp.sound = FlxG.sound.load(AssetPaths.select__wav);
 		add(endButton);
 
 		super.create();
