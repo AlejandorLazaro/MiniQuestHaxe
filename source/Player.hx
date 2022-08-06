@@ -236,7 +236,7 @@ class Player extends FlxSprite
 		#end
 
 		// Determine if the player will strafe or stand in place to aim his bow
-		if (keepAngle)
+		if (keepAngle && equippedWeapon == BOW)
 			strafingActive = true;
 		else
 			strafingActive = false;
