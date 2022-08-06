@@ -15,6 +15,7 @@ using flixel.util.FlxSpriteUtil;
 class CastleState extends FlxState
 {
 	var player:Player;
+	var portals:FlxTypedGroup<Portal>;
 	var enemies:FlxTypedGroup<Enemy>;
 	var npcs:FlxTypedGroup<NPC>;
 	var map:FlxOgmo3Loader;
@@ -59,6 +60,9 @@ class CastleState extends FlxState
 		npcs = new FlxTypedGroup<NPC>();
 		add(npcs);
 
+		portals = new FlxTypedGroup<Portal>();
+		add(portals);
+
 		player = new Player();
 		map.loadEntities(placeEntities, "entities");
 		add(player);
@@ -93,6 +97,7 @@ class CastleState extends FlxState
 		else
 		{
 			FlxG.collide(player, overworld);
+			FlxG.collide(player, portals, transitionToCastleExterior);
 			FlxG.collide(enemies, overworld);
 			FlxG.collide(npcs, overworld);
 			FlxG.collide(player, npcs);
@@ -124,6 +129,8 @@ class CastleState extends FlxState
 				npcs.add(new NPC(x, y, entity.name));
 			case "fire_ant":
 				enemies.add(new FireAnt(x, y));
+			case "portal":
+				portals.add(new Portal(x, y));
 			default: // Assume everything else is an enemy
 				enemies.add(new Enemy(x, y, entity.name));
 		}
@@ -149,12 +156,20 @@ class CastleState extends FlxState
 		}
 	}
 
-	function transitionToCastleExterior()
+	function transitionToCastleExterior(player:Player, portal:Portal)
 	{
-		FlxG.camera.fade(FlxColor.BLACK, 0.33, false, function()
+		if (player.alive && player.exists && portal.alive && portal.exists)
 		{
-			FlxG.switchState(new TestState());
-		});
+			FlxG.camera.fade(FlxColor.BLACK, 0.33, false, function()
+			{
+				// TODO: Determine how to switch states while also providing data to change how
+				// the next state will render.
+				// I.e.: Think of Mario and Luigi Superstar Saga, where you can enter and exit
+				// the same maps from and to multiple locations.
+				FlxG.switchState(new TestState());
+			});
+			player.health = 0; // Placeholder logic that kills the player until we have something meaningful happening with the castle, like loading a new level/area
+		}
 	}
 
 	function doneFadeOut()
