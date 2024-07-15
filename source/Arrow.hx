@@ -8,8 +8,9 @@ class Arrow extends FlxSprite
 {
 	private var speed:Float;
 	private var direction:FlxAngle;
-	private var damage:Float;
 	private var timer:FlxTimer;
+
+	public var damage:Int;
 
 	// public function new(x:Float, y:Float, speed:Float = 500, direction:FlxAngle = FlxAngle(), damage:Float = 1)
 	public function new(x:Float = 0, y:Float = 0)

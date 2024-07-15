@@ -6,8 +6,6 @@ import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.math.FlxPoint;
 
-using StringTools;
-
 enum WeaponType
 {
 	NONE;
@@ -29,10 +27,26 @@ class Player extends FlxSprite
 	var equippedWeapon:WeaponType;
 	var unlockedItems:Map<ItemType, Bool>; // We need something to represent unlocking items via pickups
 
+	static var INITIAL_MAX_HEALTH:Int = 3;
+
+	function REQ_EXP_FOR_LEVELUP(curr_level:Int)
+	{
+		return 2 * curr_level;
+	}
+
 	public var maxHealth:Int;
+	public var maxLevel:Int;
+
+	// TODO: Change level and health to private-like behaviors so we use callbacks to entities
+	// to damage and update stats rather than doing it within "XState" code
+	public var level:Int;
+
+	private var experience:Int;
+	private var base_damage:Int;
 
 	var state:PlayerState;
 	var attackTimer:Float;
+	// var invulnTimer:Float;  # Forgoing this since we'll use 'flicker' for the invuln state
 	var attackDelayTimer:Float;
 
 	private var aimingAngle:Float;
@@ -47,8 +61,11 @@ class Player extends FlxSprite
 	public function new(x:Float = 0, y:Float = 0)
 	{
 		super(x, y);
-		this.maxHealth = 3; // Initial max health is 3
+		this.maxHealth = INITIAL_MAX_HEALTH;
 		this.health = maxHealth;
+		this.maxLevel = 10;
+		this.level = 1;
+		this.base_damage = 1;
 		this.equippedWeapon = WeaponType.NONE;
 		this.unlockedItems = [];
 		loadGraphic(AssetPaths.Sprites2__png, true, 10, 10);
@@ -306,6 +323,82 @@ class Player extends FlxSprite
 		}
 	}
 
+	public function onBeingInjured(point:FlxPoint, damage:Int = 1)
+	{
+		this.flicker();
+		health -= damage;
+
+		if (health <= 0)
+		{
+			health = 0;
+			this.kill();
+		}
+	}
+
+	public function onEnemyContact(point:FlxPoint, damage:Int = 1)
+	{
+		if (this.isFlickering() || !this.alive)
+		{
+			return;
+		}
+		onBeingInjured(point, damage);
+	}
+
+	public function increaseExperience(exp:Int = 1)
+	{
+		if (level == maxLevel)
+		{
+			return;
+		}
+
+		var req_exp = REQ_EXP_FOR_LEVELUP(level);
+		var did_level_up = false;
+		experience += exp;
+		while (experience >= req_exp)
+		{
+			level += 1;
+			experience -= req_exp;
+			req_exp = REQ_EXP_FOR_LEVELUP(level);
+			did_level_up = true;
+		}
+
+		if (level > maxLevel)
+			level = maxLevel;
+		if (experience < 0)
+			experience = 0;
+
+		if (did_level_up)
+		{
+			base_damage = Std.int((level + 1) / 2);
+			resetHealthToMax();
+		}
+	}
+
+	public function getCurrExp()
+	{
+		return experience;
+	}
+
+	public function getCurrMaxExp()
+	{
+		return REQ_EXP_FOR_LEVELUP(level);
+	}
+
+	public function resetHealthToMax()
+	{
+		maxHealth = INITIAL_MAX_HEALTH + level;
+		health = maxHealth;
+	}
+
+	public function getDamageDone()
+	{
+		if (equippedWeapon == WeaponType.SWORD)
+		{
+			return base_damage + 1;
+		}
+		return base_damage;
+	}
+
 	private function fireArrow()
 	{
 		var arrow:Arrow = TestState.arrows.recycle();
@@ -319,6 +412,7 @@ class Player extends FlxSprite
 
 		arrow.velocity.x *= 2;
 		arrow.velocity.y *= 2;
+		arrow.damage = base_damage;
 	}
 
 	// We'll need to add logic to handle switching weapons after unlocking them
