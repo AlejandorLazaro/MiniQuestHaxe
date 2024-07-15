@@ -6,10 +6,10 @@ import enemy_library.Miasma;
 import enemy_library.SandCreep;
 import flixel.FlxG;
 import flixel.FlxObject;
-import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.addons.editors.ogmo.FlxOgmo3Loader;
 import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.math.FlxRect;
 import flixel.tile.FlxBaseTilemap;
 import flixel.tile.FlxTilemap;
 import flixel.ui.FlxButton;
@@ -89,10 +89,14 @@ class TestState extends FlxState
 		}
 		add(arrows);
 
-		FlxG.camera.follow(player, TOPDOWN, 1);
-
 		hud = new HUD();
 		add(hud);
+
+		FlxG.camera.follow(player, TOPDOWN, 1);
+		// Edit the deadzone, since the hud isn't considered by default on the presets
+		// Based on FlxCamera's `TOPDOWN` preset
+		var helper = Math.max(FlxG.width, FlxG.height - hud.getBackgroundHeight()) / 4;
+		FlxG.camera.deadzone = FlxRect.get((FlxG.width - helper) / 2, (FlxG.height - helper + hud.getBackgroundHeight()) / 2, helper, helper);
 
 		enemies.forEach(hud.addNewEnemyHealthBar);
 
@@ -202,9 +206,9 @@ class TestState extends FlxState
 			// since it'd be nice to have different damage values (upgrades, etc)
 			if (player.activeDamageAura())
 			{
-				enemy.onBeingInjured(player.getMidpoint());
+				enemy.onBeingInjured(player.getMidpoint(), player.getDamageDone());
 				hud.updateEnemyHealthBar(enemy, Std.int(enemy.health), enemy.enemyMaxHealth);
-				if (enemy.health == 0)
+				if (enemy.health <= 0)
 				{
 					// This is special behavior that allows Miasma enemies to
 					// swarm if they see the player kill another Miasma entity
@@ -212,27 +216,30 @@ class TestState extends FlxState
 					{
 						enemies.forEachOfType(Miasma, checkSeenEnemyKilled);
 					}
+					player.increaseExperience(enemy.getExperience());
+					hud.updatePlayerExperience(player.getCurrExp(), player.getCurrMaxExp());
+					hud.updatePlayerLevel(player.level, player.maxLevel);
+					hud.updatePlayerHealth(Std.int(player.health), Std.int(player.maxHealth));
 					enemy.kill();
 				}
 			}
 			else
 			{
-				player.health--;
+				player.onEnemyContact(enemy.getMidpoint(), enemy.getTouchDamage());
 				hud.updatePlayerHealth(Std.int(player.health), Std.int(player.maxHealth));
-				player.flicker();
 			}
 		}
 		FlxG.collide(player, enemy);
 		enemy.onEnemyContact(player.getMidpoint());
 	}
 
-	function arrowTouchEnemy(arrow:FlxSprite, enemy:Enemy)
+	function arrowTouchEnemy(arrow:Arrow, enemy:Enemy)
 	{
 		if (arrow.alive && arrow.exists && enemy.alive && enemy.exists && !enemy.isFlickering())
 		{
-			enemy.onBeingInjured(player.getMidpoint());
+			enemy.onBeingInjured(player.getMidpoint(), arrow.damage);
 			hud.updateEnemyHealthBar(enemy, Std.int(enemy.health), enemy.enemyMaxHealth);
-			if (enemy.health == 0)
+			if (enemy.health <= 0)
 			{
 				// This is special behavior that allows Miasma enemies to
 				// swarm if they see the player kill another Miasma entity
@@ -240,6 +247,10 @@ class TestState extends FlxState
 				{
 					enemies.forEachOfType(Miasma, checkSeenEnemyKilled);
 				}
+				player.increaseExperience(enemy.getExperience());
+				hud.updatePlayerExperience(player.getCurrExp(), player.getCurrMaxExp());
+				hud.updatePlayerLevel(player.level, player.maxLevel);
+				hud.updatePlayerHealth(Std.int(player.health), Std.int(player.maxHealth));
 				enemy.kill();
 			}
 		}
@@ -250,11 +261,15 @@ class TestState extends FlxState
 
 	function shouldBeActive(enemy:Enemy)
 	{
-		enemy.isActive = !(enemy.getMidpoint().distanceTo(player.getMidpoint()) > enemy.ACTIVE_RANGE);
+		enemy.isActive = enemy.getMidpoint().distanceTo(player.getMidpoint()) <= enemy.ACTIVE_RANGE;
 	}
 
 	function checkEnemyVision(enemy:Enemy)
 	{
+		// # Old version using the default `ray` function from FlxTilemap.hx
+		// # Replacing this with a custom version that treats the `allowCollisions`
+		// # of sky blocks as false so that enemies can still see and charge towards
+		// # the player is a TODO
 		if (overworld.ray(enemy.getMidpoint(), player.getMidpoint()))
 		{
 			enemy.seesPlayer = true;
@@ -318,7 +333,7 @@ class TestState extends FlxState
 		{
 			case Arrow:
 				FlxObject.separate(tile, object);
-				object.velocity.set(0, 0);
+				object.velocity.scale(0.25); // Slow the arrow down but let it slide
 		}
 	}
 

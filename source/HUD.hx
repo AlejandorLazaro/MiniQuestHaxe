@@ -18,6 +18,9 @@ class HUD extends FlxTypedGroup<FlxSprite>
 	var bowPickup:FlxSprite;
 	var healthCounter:FlxText;
 	var playerHealthBar:FlxBar;
+	var playerExpBar:FlxBar;
+	var playerExpCounter:FlxText;
+	var playerLevelCounter:FlxText;
 
 	public var enemyHealthBars:Map<Enemy, FlxBar>;
 
@@ -28,11 +31,24 @@ class HUD extends FlxTypedGroup<FlxSprite>
 		background.drawRect(0, 19, FlxG.width, 1, FlxColor.WHITE);
 		add(background);
 
-		healthCounter = new FlxText(16, 2, 0, "3 / 3", 8);
+		playerLevelCounter = new FlxText(2, 0, 0, "Lv 1", 8);
+		playerLevelCounter.setBorderStyle(SHADOW, FlxColor.GRAY, 1, 1);
+		add(playerLevelCounter);
+
+		playerExpBar = new FlxBar(2, 12, LEFT_TO_RIGHT, 20, 1);
+		playerExpBar.value = 0; // the enemySprite's health bar starts at 100%
+		playerExpBar.createColoredEmptyBar(FlxColor.GRAY);
+		add(playerExpBar);
+
+		playerExpCounter = new FlxText(2, 12, 0, "0/2", 6);
+		playerExpCounter.setBorderStyle(SHADOW, FlxColor.GRAY, 1, 1);
+		add(playerExpCounter);
+
+		healthCounter = new FlxText(28, 2, 0, "3 / 3", 8);
 		healthCounter.setBorderStyle(SHADOW, FlxColor.GRAY, 1, 1);
 		add(healthCounter);
 
-		playerHealthBar = new FlxBar(14, 0, LEFT_TO_RIGHT, 30, 4);
+		playerHealthBar = new FlxBar(28, 0, LEFT_TO_RIGHT, 30, 4);
 		playerHealthBar.value = 100; // the enemySprite's health bar starts at 100%
 		playerHealthBar.createFilledBar(FlxColor.BLACK, FlxColor.LIME, true, FlxColor.WHITE);
 		add(playerHealthBar);
@@ -48,6 +64,17 @@ class HUD extends FlxTypedGroup<FlxSprite>
 		add(bowPickup);
 
 		forEach(function(sprite) sprite.scrollFactor.set(0, 0));
+	}
+
+	public function updatePlayerLevel(level:Int, maxLevel:Int)
+	{
+		playerLevelCounter.text = "Lv " + level;
+	}
+
+	public function updatePlayerExperience(exp:Int, maxExp:Int)
+	{
+		playerExpCounter.text = exp + "/" + maxExp;
+		playerExpBar.value = (exp / maxExp) * 100;
 	}
 
 	public function updatePlayerHealth(health:Int, maxHealth:Int)
@@ -67,7 +94,7 @@ class HUD extends FlxTypedGroup<FlxSprite>
 	{
 		var enemyHealthBar = new FlxBar(0, 0, LEFT_TO_RIGHT, 12, 1);
 		enemyHealthBar.parent = enemy;
-		enemyHealthBar.trackParent(Std.int(-enemy.width / 2), Std.int(-enemy.height));
+		enemyHealthBar.trackParent(-(Std.int((enemyHealthBar.barWidth - enemy.width) / 2)), -(enemyHealthBar.barHeight + 1));
 		enemyHealthBar.value = 100; // the enemy's health bar starts at 100%
 		enemyHealthBar.killOnEmpty = true;
 		enemyHealthBar.visible = false;
@@ -85,5 +112,10 @@ class HUD extends FlxTypedGroup<FlxSprite>
 			case BOW:
 				bowPickup.color = FlxColor.WHITE;
 		}
+	}
+
+	public function getBackgroundHeight()
+	{
+		return this.background.height;
 	}
 }
