@@ -9,6 +9,9 @@ using flixel.util.FlxSpriteUtil;
 class Miasma extends Enemy
 {
 	static inline var SPEED:Float = 60;
+	public static var MAX_HEALTH:Int = 2;
+	public static var EXPERIENCE:Int = 2;
+	public static var TOUCH_DAMAGE:Int = 1;
 
 	var swarmTimer:Float;
 	var everBeenEnraged:Bool;
@@ -22,7 +25,7 @@ class Miasma extends Enemy
 		width = 10;
 		height = 10;
 
-		enemyMaxHealth = 2;
+		enemyMaxHealth = MAX_HEALTH;
 		health = enemyMaxHealth;
 
 		state = IDLE; // Initially this enemy starts off idle
@@ -105,5 +108,15 @@ class Miasma extends Enemy
 		{
 			state = IDLE;
 		}
+	}
+
+	override public function getTouchDamage()
+	{
+		return TOUCH_DAMAGE;
+	}
+
+	override public function getExperience()
+	{
+		return EXPERIENCE;
 	}
 }

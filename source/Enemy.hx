@@ -18,11 +18,16 @@ enum EnemyState
 
 class Enemy extends FlxSprite
 {
-	static inline var SPEED:Float = 80;
+	public static var SPEED:Float;
 
 	// Calculated based on the game dimensions in the Main.hx FlxGame params.
 	// Be sure it's roughly the following: sqrt((2x/3)^2+(2y/3)^2);x=width,y=height
 	public var ACTIVE_RANGE:Float = 175;
+
+	// Absurd sentinel values used here to ensure these are always overridden by inherited enemies
+	public static var MAX_HEALTH:Int = 100;
+	public static var TOUCH_DAMAGE:Int = 100;
+	public static var EXPERIENCE:Int = 100;
 
 	var name:String;
 
@@ -65,10 +70,10 @@ class Enemy extends FlxSprite
 		super.update(elapsed);
 	}
 
-	public function onBeingInjured(point:FlxPoint)
+	public function onBeingInjured(point:FlxPoint, damage:Int = 1)
 	{
 		this.flicker();
-		health--;
+		health -= damage;
 	}
 
 	public function onEnemyContact(point:FlxPoint)
@@ -97,18 +102,23 @@ class Enemy extends FlxSprite
 		{
 			case "miasma":
 				graphic = AssetPaths.Miasma__png;
-				enemyMaxHealth = 2;
 			case "fire_ant":
 				graphic = AssetPaths.FireAnt__png;
-				enemyMaxHealth = 5;
 			case "crab":
 				graphic = AssetPaths.Crab__png;
-				enemyMaxHealth = 2;
 			case "sand_creep":
 				graphic = AssetPaths.SandCreep__png;
-				enemyMaxHealth = 3;
 		}
-		health = enemyMaxHealth;
 		loadGraphic(graphic, true, 10, 10);
+	}
+
+	public function getTouchDamage()
+	{
+		return TOUCH_DAMAGE;
+	}
+
+	public function getExperience()
+	{
+		return EXPERIENCE;
 	}
 }

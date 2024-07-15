@@ -9,6 +9,9 @@ using flixel.util.FlxSpriteUtil;
 class Crab extends Enemy
 {
 	static inline var SPEED:Float = 60;
+	public static var MAX_HEALTH:Int = 4;
+	public static var EXPERIENCE:Int = 5;
+	public static var TOUCH_DAMAGE:Int = 3;
 
 	override public function new(x:Float, y:Float)
 	{
@@ -19,7 +22,7 @@ class Crab extends Enemy
 		width = 10;
 		height = 10;
 
-		enemyMaxHealth = 2;
+		enemyMaxHealth = MAX_HEALTH;
 		health = enemyMaxHealth;
 
 		state = IDLE; // Initially this enemy starts off idle
@@ -61,5 +64,15 @@ class Crab extends Enemy
 		}
 		else
 			idleTimer -= elapsed;
+	}
+
+	override public function getTouchDamage()
+	{
+		return TOUCH_DAMAGE;
+	}
+
+	override public function getExperience()
+	{
+		return EXPERIENCE;
 	}
 }

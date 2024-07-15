@@ -10,6 +10,9 @@ class SandCreep extends Enemy
 {
 	static inline var SPEED:Float = 40;
 	static inline var MAX_AGGRO_RANGE:Float = 65;
+	public static var MAX_HEALTH:Int = 3;
+	public static var EXPERIENCE:Int = 3;
+	public static var TOUCH_DAMAGE:Int = 2;
 
 	var swarmTimer:Float;
 	var runningTimer:Float;
@@ -24,7 +27,7 @@ class SandCreep extends Enemy
 		width = 10;
 		height = 10;
 
-		enemyMaxHealth = 2;
+		enemyMaxHealth = MAX_HEALTH;
 		health = enemyMaxHealth;
 
 		state = IDLE; // Initially this enemy starts off idle
@@ -70,10 +73,10 @@ class SandCreep extends Enemy
 		}
 	}
 
-	override public function onBeingInjured(point:FlxPoint)
+	override public function onBeingInjured(point:FlxPoint, damage:Int = 1)
 	{
-		this.flicker();
-		health--;
+		super.onBeingInjured(point, damage);
+
 		everBeenInjured = true;
 		state = RUNNING;
 		runningTimer = FlxG.random.int(2, 3);
@@ -139,5 +142,15 @@ class SandCreep extends Enemy
 		{
 			state = IDLE;
 		}
+	}
+
+	override public function getTouchDamage()
+	{
+		return TOUCH_DAMAGE;
+	}
+
+	override public function getExperience()
+	{
+		return EXPERIENCE;
 	}
 }

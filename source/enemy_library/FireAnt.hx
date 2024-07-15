@@ -9,6 +9,9 @@ using flixel.util.FlxSpriteUtil;
 class FireAnt extends Enemy
 {
 	static inline var SPEED:Float = 80;
+	public static var MAX_HEALTH:Int = 10;
+	public static var EXPERIENCE:Int = 10;
+	public static var TOUCH_DAMAGE:Int = 5;
 
 	var swarmTimer:Float;
 	var isRunning:Bool;
@@ -22,7 +25,7 @@ class FireAnt extends Enemy
 		setSize(6, 7);
 		offset.set(2, 3);
 
-		enemyMaxHealth = 5;
+		enemyMaxHealth = MAX_HEALTH;
 		health = enemyMaxHealth;
 
 		state = IDLE; // Initially this enemy starts off idle
@@ -71,10 +74,10 @@ class FireAnt extends Enemy
 		}
 	}
 
-	override public function onBeingInjured(point:FlxPoint)
+	override public function onBeingInjured(point:FlxPoint, damage:Int = 1)
 	{
-		this.flicker();
-		health--;
+		super.onBeingInjured(point, damage);
+
 		if (health <= 2)
 		{
 			isAggressive = false;
@@ -139,5 +142,15 @@ class FireAnt extends Enemy
 		{
 			state = IDLE;
 		}
+	}
+
+	override public function getTouchDamage()
+	{
+		return TOUCH_DAMAGE;
+	}
+
+	override public function getExperience()
+	{
+		return EXPERIENCE;
 	}
 }
