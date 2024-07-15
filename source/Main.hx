@@ -2,9 +2,7 @@ package;
 
 import flixel.FlxG;
 import flixel.FlxGame;
-import flixel.FlxGame;
 import flixel.util.FlxSave;
-import openfl.display.Sprite;
 import openfl.display.Sprite;
 
 class Main extends Sprite
