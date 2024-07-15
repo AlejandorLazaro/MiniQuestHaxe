@@ -6,6 +6,8 @@ import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.math.FlxPoint;
 
+using flixel.util.FlxSpriteUtil;
+
 enum WeaponType
 {
 	NONE;
